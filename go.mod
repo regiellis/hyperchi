@@ -3,7 +3,7 @@ module github.com/regiellis/hyperchi
 go 1.26.0
 
 require (
-	github.com/coder/websocket v1.8.14
+	github.com/coder/websocket v1.8.15
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/tdewolff/minify/v2 v2.24.13
 	go.etcd.io/bbolt v1.4.3
