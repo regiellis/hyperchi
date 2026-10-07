@@ -1,0 +1,154 @@
+{{define "layout-base"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.meta.Title}}</title>
+<meta name="description" content="{{.meta.Description}}">
+<link rel="canonical" href="{{.meta.Canonical}}">
+{{- if .meta.NoIndex}}
+<meta name="robots" content="noindex">
+{{- end}}
+<meta property="og:site_name" content="{{.site.Name}}">
+<meta property="og:type" content="{{.meta.Type}}">
+<meta property="og:title" content="{{.meta.Title}}">
+<meta property="og:description" content="{{.meta.Description}}">
+<meta property="og:url" content="{{.meta.Canonical}}">
+<meta property="og:image" content="{{.meta.Image}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{.meta.ImageAlt}}">
+<meta name="twitter:card" content="summary_large_image">
+{{- if eq .meta.Type "article"}}
+<meta property="article:published_time" content="{{.meta.Published.Format "2006-01-02"}}">
+{{- end}}
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4eee2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1220" media="(prefers-color-scheme: dark)">
+<meta name="htmx-config" content='{"includeIndicatorCSS":false}'>
+<link rel="icon" href="{{asset "/static/img/favicon.svg"}}" type="image/svg+xml">
+<link rel="alternate" type="application/atom+xml" title="{{.site.Name}} devlog" href="{{.site.FeedURL}}">
+<link rel="preload" href="{{asset "/static/fonts/fraunces-latin-wght-normal.woff2"}}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{asset "/static/css/site.css"}}">
+<script src="{{asset "/static/js/theme.js"}}"></script>
+<script defer src="{{asset "/static/js/htmx.min.js"}}"></script>
+<script defer src="{{asset "/static/js/hyperchi-directives.js"}}"></script>
+<script defer src="{{asset "/static/js/site.js"}}"></script>
+</head>
+<body hc-data="site()">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/"{{if eq .meta.Section "home"}} aria-current="page"{{end}}>{{template "mark"}}<span>{{.site.Name}}</span></a>
+    <nav class="primary-nav" aria-label="Primary">
+      <ul>
+        {{- range .site.Nav}}
+        <li><a href="{{.Path}}"{{if eq .Section $.meta.Section}} aria-current="page"{{end}}>{{.Label}}</a></li>
+        {{- end}}
+      </ul>
+    </nav>
+    <button type="button" class="theme-toggle" hc-cloak hc-on:click="toggleTheme()" hc-bind:aria-pressed="String(dark)" aria-pressed="false">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+      <span class="sr-only">Dark theme</span>
+    </button>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+{{.content}}
+</main>
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="/">{{template "mark"}}<span>{{.site.Name}}</span></a>
+      <p>{{.site.Tagline}}</p>
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        <li><a href="/games">Games</a></li>
+        <li><a href="/devlog">Devlog</a></li>
+        <li><a href="/press">Press kit</a></li>
+        <li><a href="/careers">Careers</a></li>
+        <li><a href="/newsletter">Newsletter</a></li>
+        <li><a href="{{.site.FeedURL}}">Atom feed</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+      </ul>
+    </nav>
+    <p class="footer-note">&copy; {{.site.Year}} {{.site.Name}}. A fictional studio: this site is an example built with the HyperChi framework.</p>
+  </div>
+</footer>
+</body>
+</html>
+{{end}}
+
+{{define "mark"}}<svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path class="mark-frame" d="M11 9h10l-1 15H12Z"/><path class="mark-frame" d="M13 9a3 3 0 0 1 6 0M10 24h12"/><path class="mark-flame" d="M16 13c2 2.4 2.3 4.4 0 7-2.3-2.6-2-4.6 0-7Z"/><path class="mark-wave" d="M4 28c2.7 0 2.7-1.6 5.3-1.6S12 28 14.7 28s2.6-1.6 5.3-1.6 2.6 1.6 5.3 1.6S28 26.4 28 26.4"/></svg>{{end}}
+
+{{define "game-card"}}
+<li class="game-card">
+  <a href="{{.Path}}">
+    <img src="{{asset .Cover.Src}}" alt="" width="1200" height="630" loading="lazy" decoding="async">
+    <span class="game-card-body">
+      <span class="status status-{{.StatusKind}}">{{.Status}}</span>
+      <span class="game-card-title">{{.Title}}</span>
+      <span class="game-card-tagline">{{.Tagline}}</span>
+      <span class="game-card-platforms">{{join .Platforms " · "}}</span>
+    </span>
+  </a>
+</li>
+{{end}}
+
+{{/* post-item renders one devlog entry. Called with dict "post" and "hx":
+     with hx true, its tag links swap #main through htmx like the filter bar. */}}
+{{define "post-item"}}{{with .post}}
+<li class="post-item">
+  <article>
+    <p class="post-meta"><time datetime="{{.Date.Format "2006-01-02"}}">{{.Date.Format "2 January 2006"}}</time><span aria-hidden="true"> · </span><span class="sr-only">, by </span>{{.Author}}</p>
+    <h3><a href="{{.Path}}">{{.Title}}</a></h3>
+    <p class="post-summary">{{.Summary}}</p>
+    {{template "tags" (dict "tags" .Tags "hx" $.hx)}}
+  </article>
+</li>
+{{end}}{{end}}
+
+{{define "tags"}}
+<ul class="tags" aria-label="Tags">
+  {{- range .tags}}
+  <li><a href="/devlog?tag={{.}}"{{if $.hx}} hx-get="/devlog?tag={{.}}" hx-target="#main" hx-push-url="true"{{end}}>{{.}}</a></li>
+  {{- end}}
+</ul>
+{{end}}
+
+{{define "newsletter-form"}}{{with .form}}
+<form class="signup" action="/newsletter" method="post" hx-post="/newsletter" hx-target="this" hx-swap="outerHTML">
+  <div class="field{{if .Errors.email}} has-error{{end}}">
+    <label for="signup-email">Email address</label>
+    <input id="signup-email" name="email" type="email" inputmode="email" autocomplete="email" required maxlength="254" value="{{.Email}}"{{if .Errors.email}} aria-invalid="true" aria-describedby="signup-email-error" autofocus{{end}}>
+    {{- with .Errors.email}}
+    <p class="field-error" id="signup-email-error">{{.}}</p>
+    {{- end}}
+  </div>
+  <fieldset class="field{{if .Errors.list}} has-error{{end}}"{{if .Errors.list}} aria-describedby="signup-list-error"{{end}}>
+    <legend>What should we send?</legend>
+    <label class="choice"><input type="radio" name="list" value="studio" required{{if eq .List "studio"}} checked{{end}}{{if and .Errors.list (not .Errors.email)}} autofocus{{end}}> Every devlog post, plus launch news</label>
+    <label class="choice"><input type="radio" name="list" value="launch"{{if eq .List "launch"}} checked{{end}}> Only The Lamplit Crossing launch</label>
+    {{- with .Errors.list}}
+    <p class="field-error" id="signup-list-error">{{.}}</p>
+    {{- end}}
+  </fieldset>
+  <div class="hp" aria-hidden="true">
+    <label for="signup-website">Leave this field empty</label>
+    <input id="signup-website" name="website" type="text" tabindex="-1" autocomplete="off">
+  </div>
+  <div class="signup-actions">
+    <button class="button" type="submit"><span class="when-idle">Join the list</span><span class="when-busy" aria-hidden="true">Joining</span></button>
+    <p id="newsletter-status" class="form-status" role="status"></p>
+  </div>
+  <p class="fine-print">We store your address and your choice, nothing else. This example site sends no email. <a href="/privacy">Privacy</a></p>
+</form>
+{{end}}{{end}}
+
+{{define "newsletter-done"}}
+<div class="signup-done" role="status">
+  <p class="signup-done-title">You are on the list.</p>
+  <p>{{with .email}}We saved <strong>{{.}}</strong>. {{end}}This is an example site, so no confirmation email was sent and none will be: your address sits in the site's database and nothing else happens. A real studio would send a confirmation link now.</p>
+</div>
+{{end}}

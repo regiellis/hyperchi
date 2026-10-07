@@ -1,0 +1,70 @@
+version: '3'
+
+vars:
+  BACKEND_PORT: 8080
+  FRONTEND_PORT: 3000
+  BIN: bin/app
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds: [task --list]
+
+  install:
+    desc: Install frontend dependencies (idempotent)
+    cmds: [npm install]
+    sources:
+      - package.json
+      - package-lock.json
+    generates:
+      - node_modules/.package-lock.json
+
+  backend:
+    desc: Start Go backend on :{{.BACKEND_PORT}} (no hot reload)
+    cmds: [go run .]
+
+  backend:air:
+    desc: Start Go backend with Air hot reload on :{{.BACKEND_PORT}}
+    cmds: [air]
+
+  frontend:
+    desc: Start Vite dev server on :{{.FRONTEND_PORT}}
+    deps: [install]
+    cmds: [npm run dev]
+
+  dev:
+    desc: Start backend + Vite together (Ctrl-C stops both)
+    deps:
+      - backend
+      - frontend
+
+  dev:air:
+    desc: Start backend (Air hot reload) + Vite together
+    deps:
+      - backend:air
+      - frontend
+
+  build:frontend:
+    desc: Build frontend assets to dist/
+    deps: [install]
+    cmds: [npm run build]
+
+  build:
+    desc: Build frontend + Go binary for production (self-contained)
+    deps: [build:frontend]
+    cmds:
+      - mkdir -p bin
+      - go build -ldflags='-s -w' -o {{.BIN}} .
+      - 'echo "Built {{.BIN}} ($(du -h {{.BIN}} | cut -f1))"'
+
+  serve:
+    desc: Run the production binary
+    deps: [build]
+    env:
+      ENVIRONMENT: "production"
+    cmds: ["./{{.BIN}}"]
+
+  clean:
+    desc: Remove build artifacts and dependencies
+    cmds:
+      - rm -rf dist/ tmp/ node_modules/ bin/ .task/

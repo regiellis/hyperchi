@@ -1,0 +1,16 @@
+{{define "sidebar"}}
+<aside class="hidden md:block sticky top-20 self-start w-56 flex-shrink-0">
+    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium px-3 mb-2">Documentation</div>
+    <nav class="space-y-0.5">
+        <a href="/docs/directives" class="sidebar-link" {{if eq .current "directives"}}aria-current="page"{{end}}>Directives</a>
+        <a href="/docs/htmx" class="sidebar-link" {{if eq .current "htmx"}}aria-current="page"{{end}}>HTMX</a>
+        <a href="/docs/view-transitions" class="sidebar-link" {{if eq .current "view-transitions"}}aria-current="page"{{end}}>View Transitions</a>
+        <a href="/docs/deploy" class="sidebar-link" {{if eq .current "deploy"}}aria-current="page"{{end}}>Deploy</a>
+    </nav>
+    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium px-3 mt-6 mb-2">Reference</div>
+    <nav class="space-y-0.5">
+        <a href="https://four.htmx.org" target="_blank" rel="noopener" class="sidebar-link">htmx 4 docs ↗</a>
+        <a href="https://github.com/regiellis/hyperchi" target="_blank" rel="noopener" class="sidebar-link">HyperChi repo ↗</a>
+    </nav>
+</aside>
+{{end}}

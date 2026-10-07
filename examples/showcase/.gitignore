@@ -1,0 +1,9 @@
+# Build artifacts and hot-reload output
+/tmp/
+/showcase
+build-errors.log
+
+# Generated SQLite database (never commit generated databases)
+*.db
+*.db-shm
+*.db-wal

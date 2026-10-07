@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en"
+      hc-data="app()"
+      hc-persist="darkMode:theme"
+      hc-effect="document.documentElement.classList.toggle('dark', !!darkMode); document.body.style.overflow = modalId === null ? '' : 'hidden'"
+      hc-cloak>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title | default "Streamer"}} - Swiss Design Podcast Platform</title>
+    <meta name="description" content="{{.description | default "A Swiss design inspired podcast platform built with HyperChi and HTMX"}}">
+
+    <!-- HyperChi htmx 4 defaults: htmx 2-compatible inheritance, no auto-swap on
+         error responses, no request timeout. Override per-page if needed. -->
+    <meta name="htmx-config" content='{"implicitInheritance": true, "noSwap": [204, 304, "4xx", "5xx"], "defaultTimeout": 0, "transitions": true}'>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="{{asset "/static/favicon.svg"}}">
+
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+    <!-- Tailwind CSS v3 - CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['Instrument Serif', 'serif'],
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'base-light': '#f5f5fa',
+                        'base-medium': '#e2e8f0',
+                        'gray-medium': '#374151',
+                        'base': '#ffffff',
+                        'neutral-950': '#0a0a0a',
+                        'neutral-900': '#18181b',
+                        'neutral-800': '#27272a',
+                        'neutral-400': '#9ca3af',
+                        'neutral-200': '#e5e7eb',
+                        'black': '#111827',
+                        'white': '#ffffff',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- HTMX for enhanced interactions -->
+    <script src="{{asset "/static/js/htmx.min.js"}}"></script>
+
+    <!-- HyperChi declarative directives -->
+    <script src="{{asset "/static/js/hyperchi-directives.js"}}"></script>
+
+
+    <!-- Custom CSS -->
+    <style>
+        [hc-cloak] { display: none !important; }
+
+        /* Typography stylistic sets for Inter */
+        :root {
+            font-feature-settings:
+                "tnum" 1, "zero" 1, "cv01" 1, "cv09" 1, "cv02" 1,
+                "cv03" 1, "cv04" 1, "ss08" 1, "dlig" 1, "cv06" 1,
+                "cv10" 1, "cv13" 1;
+        }
+        @supports (font-variation-settings: normal) {
+            :root { font-family: InterVariable, sans-serif; }
+        }
+
+        /* Scrollbar hide for modal */
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        /* hc-transition presets (CSS-class lifecycle managed by hyperchi-directives) */
+        .fade-enter { animation: hc-fade-in 300ms ease-out forwards; }
+        .fade-leave { transition: opacity 200ms ease-in; opacity: 0; }
+        @keyframes hc-fade-in { from { opacity: 0 } to { opacity: 1 } }
+
+        .reveal-enter { animation: hc-reveal-in 500ms ease-out forwards; }
+        .reveal-leave { transition: max-height 300ms ease-in, opacity 300ms ease-in; max-height: 0; opacity: 0; }
+        @keyframes hc-reveal-in {
+            from { opacity: 0; max-height: 0 }
+            to { opacity: 1; max-height: 100vh }
+        }
+
+        .slide-up-enter { animation: hc-slide-up-in 300ms 150ms ease-out both; }
+        .slide-up-leave { transition: opacity 200ms ease-in, transform 200ms ease-in; opacity: 0; transform: translateY(2rem); }
+        @keyframes hc-slide-up-in {
+            from { opacity: 0; transform: translateY(2rem) }
+            to   { opacity: 1; transform: translateY(0) }
+        }
+    </style>
+</head>
+<body class="bg-base-light dark:bg-neutral-950 p-8" hx-boost:inherited="true">
+    <main class="grow">
+        <!-- Header Section -->
+        <div class="max-w-5xl mx-auto pb-24">
+            <div class="flex items-center justify-between text-gray-medium dark:text-base-medium">
+                <p class="text-base font-serif italic uppercase text-neutral-900 dark:text-base-light">streamer</p>
+                <div class="flex gap-4 items-center">
+                    <a href="{{ .spotify }}" class="text-base font-serif italic hover:underline text-neutral-900 dark:text-base-light">Spotify</a>
+                    <a href="#" class="text-base font-serif italic hover:underline text-neutral-900 dark:text-base-light">Overcast</a>
+                    <a href="#" class="text-base font-serif italic hover:underline text-neutral-900 dark:text-base-light">Apple Podcasts</a>
+                    <button hc-on:click="toggleTheme()" class="text-base font-serif italic hover:underline flex items-center gap-2 text-neutral-900 dark:text-base-light">
+                        <span hc-show="!darkMode">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                            </svg>
+                        </span>
+                        <span hc-show="darkMode">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Podcast List Section -->
+        <div class="max-w-5xl mx-auto">
+            <!-- Table Header -->
+            <div class="grid grid-cols-4 md:grid-cols-6 gap-2 md:gap-4 py-4 text-sm border-b border-neutral-200 dark:border-neutral-900 text-black dark:text-neutral-400 font-serif">
+                <div>Date</div>
+                <div class="md:col-span-3">Archive</div>
+                <div class="hidden md:block">Type</div>
+                <div class="text-right hidden md:block text-neutral-500">Duration</div>
+            </div>
+
+            <!-- Podcast Rows -->
+            <div class="project-list divide-y divide-neutral-200 dark:divide-neutral-900">
+                {{range .podcasts}}
+                <div class="group" id="podcast-{{.ID}}">
+                    <!-- Clickable Row -->
+                    <div id="podcast-row-{{.ID}}"
+                         class="grid grid-cols-4 md:grid-cols-6 gap-2 md:gap-4 font-serif py-4 px-4 md:px-6 cursor-pointer items-center text-black dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors"
+                         hc-on:click="expandedId = (expandedId === {{.ID}} ? null : {{.ID}})"
+                         hc-bind:class="{ 'bg-neutral-50 dark:bg-neutral-900/50': expandedId === {{.ID}} }">
+                        <div>
+                            <p class="text-base italic text-neutral-500">{{.Date}}</p>
+                        </div>
+                        <div class="col-span-3">
+                            <p class="text-base tracking-wide text-neutral-900 dark:text-base-light">{{.Title}}</p>
+                        </div>
+                        <div class="hidden md:block">
+                            <p class="text-base italic text-neutral-900 dark:text-neutral-500">{{.Category}}</p>
+                        </div>
+                        <div class="text-right hidden md:block italic">
+                            <p class="text-base text-neutral-700 dark:text-neutral-500">{{.Duration}}</p>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Details — toggled by hc-show, fragment loaded once via HTMX -->
+                    <div hc-show="expandedId === {{.ID}}"
+                         hc-transition="enter:reveal-enter|leave:reveal-leave"
+                         class="overflow-hidden px-4 md:px-6"
+                         hx-get="/podcast/{{.ID}}/details"
+                         hx-target="this"
+                         hx-trigger="click from:#podcast-row-{{.ID}} once"
+                         hx-swap="innerHTML">
+                        <div class="p-4 text-center text-neutral-500">
+                            <p>Loading podcast details...</p>
+                        </div>
+                    </div>
+
+                    <!-- Modal Overlay — backdrop click closes via hc-on:click.self -->
+                    <div hc-show="modalId === {{.ID}}"
+                         hc-transition="enter:fade-enter|leave:fade-leave"
+                         hc-on:click.self="modalId = null"
+                         class="fixed inset-0 z-50 bg-base-light/10 dark:bg-neutral-900/80 overflow-y-auto scrollbar-hide h-full w-full flex items-start justify-center pt-12">
+                        <div hc-show="modalId === {{.ID}}"
+                             hc-transition="enter:slide-up-enter|leave:slide-up-leave"
+                             class="relative max-w-3xl mx-4 bg-base-medium dark:bg-neutral-900 shadow ring ring-neutral-200 dark:ring-neutral-800 rounded-lg">
+                            <button hc-on:click="modalId = null"
+                                    class="absolute top-8 right-8 text-xs text-black dark:text-neutral-400 hover:underline z-10">
+                                Close
+                            </button>
+                            <div class="p-8 lg:p-12"
+                                 hx-get="/podcast/{{.ID}}/modal"
+                                 hx-target="this"
+                                 hx-trigger="load once"
+                                 hx-swap="innerHTML">
+                                <div class="text-center text-neutral-500">
+                                    <p>Loading podcast details...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-xs pb-8 pt-48">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            <div class="gap-4 flex flex-col">
+                <div class="gap-1 flex flex-col">
+                    <p class="text-sm font-serif italic text-black dark:text-neutral-500">You can find me here:</p>
+                    <a href="https://regiellis.com/" target="_blank" class="text-xs dark:text-neutral-500 underline">Personal Site</a>
+                </div>
+                <div class="gap-1 flex flex-col">
+                    <p class="text-sm font-serif italic text-black dark:text-neutral-500">Other Projects</p>
+                    <a href="https://github.com/regiellis" class="text-xs dark:text-neutral-500 underline">GitHub</a>
+                </div>
+            </div>
+            <div>
+                <p class="text-base font-serif italic text-black dark:text-white">Attributions</p>
+                <p class="text-xs text-neutral-500 mt-1">
+                    Streamer Design template was originally created by <a href="https://lexingtonthemes.com" target="_blank" class="dark:text-neutral-500 text-black underline">Lexington Themes</a> for Astro.
+                    It has been converted to HyperChi to showcase the framework's capabilities while maintaining the original Swiss design aesthetic.
+                </p>
+            </div>
+            <div>
+                <p class="text-base font-serif italic text-black dark:text-white">Colophon</p>
+                <p class="text-xs text-neutral-500 mt-1">
+                    This site demonstrates HyperChi, a Go framework that combines server-side rendering with HTMX and HyperChi declarative directives for dynamic interactivity.
+                    <a href="https://github.com/regiellis/hyperchi" class="dark:text-neutral-500 text-black underline">HyperChi is open source</a>.
+                </p>
+            </div>
+            <div>
+                <p class="text-base font-serif italic text-black dark:text-white">Thank you</p>
+                <p class="text-xs text-neutral-500 mt-1">
+                    Thank you for exploring HyperChi! This example demonstrates the framework's built-in declarative directive system,
+                    which provides small reactive primitives (hc-data, hc-show, hc-transition, hc-persist, etc.) without an external dependency.
+                </p>
+            </div>
+            <p class="text-base flex flex-col text-black dark:text-white font-serif gap-1 italic">
+                Original Design
+                <span class="text-neutral-500 text-xs">
+                    <a href="https://lexingtonthemes.com" class="hover:underline">Lexington Themes</a> •
+                    <a href="https://github.com/regiellis/hyperchi" class="hover:underline">HyperChi</a> •
+                    <a href="https://github.com/regiellis" class="hover:underline">@regiellis</a>
+                </span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- App component — single source of truth for theme + expanded row + open modal -->
+    <script>
+        HyperChi.registerComponent('app', () => ({
+            // hc-persist hydrates from localStorage; default for first visit is dark
+            darkMode: true,
+
+            // currently-expanded row id, or null
+            expandedId: null,
+
+            // currently-open modal id, or null
+            modalId: null,
+
+            toggleTheme() {
+                this.darkMode = !this.darkMode
+            },
+        }))
+
+        // Boot the directive engine: walks the document, wires reactive
+        // bindings, and observes future DOM changes (incl. HTMX swaps).
+        HyperChi.start()
+
+    </script>
+</body>
+</html>

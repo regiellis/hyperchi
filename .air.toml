@@ -1,0 +1,97 @@
+# Air configuration for GinHX component-based development
+# Live reload for Go development with Chi router and component-first architecture
+
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  # Build command for the main application
+  cmd = "go build -o ./tmp/main ."
+  
+  # Binary file to run
+  bin = "tmp/main"
+  
+  # Customize the binary name
+  full_bin = ""
+  
+  # Watch these filename extensions
+  include_ext = ["go", "tpl", "tmpl", "html", "js", "css"]
+  
+  # Ignore these filename extensions or directories
+  exclude_dir = [
+    "assets", "tmp", "vendor", "testdata", "frontend/node_modules", 
+    "frontend/dist", "bin", "logs", ".git", ".vscode", ".idea"
+  ]
+  
+  # Watch these directories if you have subdirectories
+  include_dir = []
+  
+  # Exclude files
+  exclude_file = []
+  
+  # Exclude specific regular expressions
+  exclude_regex = ["_test.go", ".*_test\\.go$"]
+  
+  # Exclude unchanged files
+  exclude_unchanged = false
+  
+  # Follow symlinks before watching
+  follow_symlink = false
+  
+  # This log file places in your tmp_dir
+  log = "errors.log"
+  
+  # Poll files for changes instead of using fsnotify
+  poll = false
+  
+  # Poll interval (defaults to the minimum interval of 500ms)
+  poll_interval = 0
+  
+  # Enable live reloading on the browser
+  rerun = true
+  
+  # Delay after each file changes triggers a new build
+  rerun_delay = 500
+  
+  # Add additional arguments when running binary
+  args_bin = []
+  
+  # Binary build errors
+  stop_on_root = false
+
+[log]
+  # Show log time
+  time = true
+  
+  # Only show main log (silences watcher, build, runner)
+  main_only = false
+
+[color]
+  # Customize each part's color. If no color found, use the raw app log.
+  main = "magenta"
+  watcher = "cyan" 
+  build = "yellow"
+  runner = "green"
+
+[misc]
+  # Delete tmp directory on exit
+  clean_on_exit = true
+
+[screen]
+  # Clear screen on startup
+  clear_on_rebuild = true
+  
+  # Enable or disable keep_scroll
+  keep_scroll = true
+
+# GinHX-specific environment variables
+[build.env]
+  # Set development environment
+  GO_ENV = "development"
+  
+  # Enable component hot reload (if implemented)
+  GINHX_DEV_MODE = "true"
+  
+  # Frontend asset development server
+  FRONTEND_DEV_SERVER = "http://localhost:5173"

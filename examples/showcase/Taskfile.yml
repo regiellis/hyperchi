@@ -1,0 +1,72 @@
+version: '3'
+
+# HyperChi showcase example. Single Go server that serves its own static assets,
+# binds localhost by default. Public hosting requires an explicit HTTPS origin.
+# Override the port with: task dev PORT=9000
+
+vars:
+  PORT: '{{.PORT | default "9999"}}'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  deps:
+    desc: Sync Go dependencies (go.mod / go.sum)
+    cmds:
+      - go mod tidy
+
+  dev:
+    desc: Run with Air hot reload on localhost:{{.PORT}} (rebuilds on .go/.tmpl edits)
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - air
+
+  run:
+    desc: Run without hot reload on localhost:{{.PORT}}
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - go run .
+
+  build:
+    desc: Build the pure-Go showcase binary to ./tmp/showcase (no C toolchain)
+    env:
+      CGO_ENABLED: '0'
+    cmds:
+      - go build -o ./tmp/showcase .
+
+  generate:
+    desc: Regenerate the pinned templ components
+    cmds:
+      - go generate ./...
+
+  test:
+    desc: Run the example's tests
+    cmds:
+      - go test ./...
+
+  fmt:
+    desc: Format Go sources
+    cmds:
+      - gofmt -w .
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - rm -rf tmp/ build-errors.log
+
+  check:
+    desc: Vet, race tests (Go's race detector needs a C toolchain; the site does not), and offline release checks
+    cmds:
+      - go vet ./...
+      - go test -race ./...
+      - python3 -m unittest discover -s scripts -p 'test_deployment.py'
+
+  security:
+    desc: Scan reachable Go dependencies
+    cmds:
+      - go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 ./...

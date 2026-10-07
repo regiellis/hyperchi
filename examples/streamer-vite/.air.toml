@@ -1,0 +1,30 @@
+# Air configuration for HyperChi
+# Generated automatically - modify as needed
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ."
+bin = "tmp/main"
+log = "tmp/build-errors.log"
+exclude_dir = ["assets", "tmp", "vendor", "testdata", "examples", "docs", "node_modules", ".git", "dist", "build", "public", "static", "uploads", "logs", "storage", "cache"]
+exclude_file = ["README.md", "Makefile", "*.md", "*.yml", "*.yaml", "*.json", "*.toml", "*.lock", "go.sum"]
+exclude_regex = ["_test\.go", ".*_gen\.go", "\.#.*", ".*~"]
+include_ext = ["go", "tpl", "tmpl", "html", "js", "css", "md", "env", "gotmpl", "gohtml"]
+kill_delay = "0s"
+send_interrupt = false
+stop_on_root = false
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[log]
+time = false
+main_only = false
+
+[misc]
+clean_on_exit = false

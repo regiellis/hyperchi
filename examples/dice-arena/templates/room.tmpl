@@ -1,0 +1,134 @@
+{{define "room"}}
+<main id="main" class="page room" hx-ws:connect="/ws/r/{{.code}}" hc-on:htmx:ws:close="online = false" hc-on:htmx:ws:after:connection="online = true">
+  <div class="room-head">
+    <div>
+      <p class="eyebrow">Table</p>
+      <h1 class="room-code mono">{{.code}}</h1>
+    </div>
+    <div class="room-actions">
+      <button type="button" class="btn btn-small btn-quiet" data-code="{{.code}}" hc-on:click="copyInvite($event)" hc-text="copyLabel">Copy invite link</button>
+      <a class="btn btn-small btn-quiet" href="/">Lobby</a>
+    </div>
+  </div>
+  <p class="offline" role="status" hc-show="!online" hc-cloak>Connection lost. Reconnecting…</p>
+  <p class="sr-only" aria-live="polite" hc-text="copyStatus"></p>
+  <div id="flash" class="flash-slot"></div>
+  <p id="announce" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+  <div class="room-grid">
+    <section id="table" class="felt" aria-label="Dice table">{{template "table" .}}</section>
+    <aside id="board" class="board" aria-label="Players and table log">{{template "board" .}}</aside>
+  </div>
+  {{template "rules" .}}
+</main>
+{{end}}
+
+{{define "board"}}{{with .b}}
+<div class="panel-head">
+  <h2>Players</h2>
+  <span class="muted">first to {{.Target}}</span>
+</div>
+<ol class="roster">
+  {{range .Seats}}
+  <li class="seat{{if .Turn}} is-turn{{end}}{{if .Away}} is-away{{end}}{{if .Winner}} is-winner{{end}}">
+    <span class="seat-mark" aria-hidden="true"></span>
+    <span class="seat-name">{{.Name}}</span>
+    <span class="seat-state">{{if .Winner}}winner{{else if .Away}}reconnecting{{else if .Turn}}rolling{{end}}</span>
+    <span class="seat-score num">{{.Score}}</span>
+  </li>
+  {{end}}
+  {{if .Free}}<li class="seat seat-open"><span class="seat-mark" aria-hidden="true"></span><span class="seat-name">{{.Free}} open {{if eq .Free 1}}seat{{else}}seats{{end}}</span></li>{{end}}
+</ol>
+<p class="spectators">{{if .Spectators}}{{.Spectators}} watching{{else}}Nobody watching{{end}}</p>
+<h3 class="log-title">Table log</h3>
+{{if .Log}}<ol class="log">{{range .Log}}<li>{{.}}</li>{{end}}</ol>{{else}}<p class="empty">Nothing yet.</p>{{end}}
+{{end}}{{end}}
+
+{{define "table"}}{{with .t}}
+<div class="table-inner">
+{{if eq .Status "waiting"}}
+  <div class="table-copy">
+    <h2 class="table-title">Waiting for players</h2>
+    <p>{{.Seats}} of {{$.maxSeats}} seats taken. Share the code <strong class="mono">{{.Code}}</strong> or the page link.</p>
+    {{if .NeedPlayers}}<p class="note">You need one more player to start.</p>{{end}}
+  </div>
+  <div class="controls">
+    {{if .CanStart}}<form hx-ws:send><input type="hidden" name="action" value="start"><button class="btn btn-primary">Start the game</button></form>{{end}}
+    {{template "seat-controls" .}}
+  </div>
+{{else if .Over}}
+  <div class="table-copy">
+    <h2 class="table-title">{{if .YouWon}}You win.{{else if .Winner}}{{.Winner}} wins.{{else}}Game over.{{end}}</h2>
+    <p>{{.Last}}</p>
+  </div>
+  <div class="controls">
+    {{if .CanRematch}}<form hx-ws:send><input type="hidden" name="action" value="rematch"><button class="btn btn-primary">Play again</button></form>{{end}}
+    {{template "seat-controls" .}}
+  </div>
+{{else}}
+  <div class="turn-head">
+    <h2 class="table-title">{{if .MyTurn}}Your turn{{else}}{{.Current}} is rolling{{end}}</h2>
+    <p class="turn-meta">
+      <span>Turn <strong class="num">{{.TurnPts}}</strong></span>
+      <span>Rolls left <strong class="num">{{.RollsLeft}}</strong> of {{.MaxRolls}}</span>
+    </p>
+  </div>
+  {{if .CurrentAway}}<p class="note">{{.Current}} lost connection. Their seat is held for a short while.</p>{{end}}
+  <form class="tray" hx-ws:send hc-data="tray()" hc-on:change="count($event)">
+    <fieldset class="dice{{if .Animate}} tumble{{end}}"{{if not (and .MyTurn .Rolled)}} disabled{{end}}>
+      <legend class="sr-only">{{if and .MyTurn .Rolled}}Choose dice to set aside{{else}}Dice on the table{{end}}</legend>
+      {{range $i, $d := .Dice}}
+      <label class="die" style="--i: {{$i}}">
+        <input type="checkbox" name="keep" value="{{$d.Index}}" hx-ws:send hx-vals='{"action": "preview"}' data-die="{{$i}}">
+        <span class="face{{if not $d.Value}} blank{{end}}" aria-hidden="true">{{range $d.Cells}}<i{{if .}} class="pip"{{end}}></i>{{end}}</span>
+        <span class="sr-only">{{if $d.Value}}{{$d.Value}}{{else}}not rolled yet{{end}}</span>
+      </label>
+      {{end}}
+    </fieldset>
+    {{if .Held}}
+    <div class="held">
+      <span class="held-label">Set aside</span>
+      <span class="held-dice">{{range .Held}}<span class="face face-small" role="img" aria-label="{{.Value}}">{{range .Cells}}<i{{if .}} class="pip"{{end}}></i>{{end}}</span>{{end}}</span>
+    </div>
+    {{end}}
+    {{if .MyTurn}}
+    <p id="preview" class="preview" aria-live="polite">{{if .Rolled}}Pick the dice to set aside.{{else}}Roll to start your turn.{{end}}</p>
+    <div class="controls">
+      {{if .Rolled}}
+        {{if .CanRoll}}<button class="btn btn-primary" name="action" value="roll" data-key="r" disabled hc-bind:disabled="picked === 0">Set aside, roll again</button>{{end}}
+        <button class="btn{{if not .CanRoll}} btn-primary{{end}}" name="action" value="bank" data-key="b" disabled hc-bind:disabled="picked === 0">Set aside, bank</button>
+      {{else}}
+        <button class="btn btn-primary" name="action" value="roll" data-key="r">Roll the dice</button>
+      {{end}}
+    </div>
+    <p class="keys">Keys: <kbd>1</kbd> to <kbd>6</kbd> pick dice, <kbd>R</kbd> rolls, <kbd>B</kbd> banks.</p>
+    {{else}}
+    <p class="watch-note">{{.Last}}</p>
+    {{end}}
+  </form>
+  <div class="controls controls-end">{{template "seat-controls" .}}</div>
+{{end}}
+</div>
+{{end}}{{end}}
+
+{{define "seat-controls"}}
+{{if .CanSit}}
+  {{if .Named}}<form hx-ws:send><input type="hidden" name="action" value="sit"><button class="btn">Take a seat</button></form>
+  {{else}}<p class="note"><a href="/?code={{.Code}}">Pick a name</a> to take a seat.</p>{{end}}
+{{end}}
+{{if .Seated}}<form hx-ws:send><input type="hidden" name="action" value="leave"><button class="btn btn-quiet">Leave the table</button></form>{{end}}
+{{end}}
+
+{{define "table-gone"}}
+<div class="table-inner">
+  <div class="table-copy">
+    <h2 class="table-title">This table has closed.</h2>
+    <p>Everyone left. <a href="/">Find another table in the lobby.</a></p>
+  </div>
+</div>
+{{end}}
+
+{{define "preview"}}{{if .problem}}<span class="problem">{{.problem}}</span>{{else if .points}}Set aside {{.picked}} {{if eq .picked 1}}die{{else}}dice{{end}} for <strong class="num">{{.points}}</strong>.{{else}}Pick the dice to set aside.{{end}}{{end}}
+
+{{define "flash"}}{{with .message}}<div class="flash" role="alert" hc-data="dismissable()" hc-show="open"><p>{{.}}</p><button type="button" class="flash-close" hc-on:click="open = false" aria-label="Dismiss message">×</button></div>{{end}}{{end}}
+
+{{define "announce"}}{{.text}}{{end}}

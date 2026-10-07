@@ -1,0 +1,33 @@
+# HyperChi showcase: Air live-reload config.
+# The SQLite driver is pure Go, so the build needs no C toolchain.
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go generate ./... && CGO_ENABLED=0 go build -o ./tmp/showcase ."
+  bin = "./tmp/showcase"
+  delay = 800
+  # Static assets are embedded, so asset edits also require rebuilding.
+  include_ext = ["go", "templ", "jet", "tmpl", "md", "html", "env", "js", "css", "svg", "webp", "png", "woff2"]
+  exclude_dir = ["tmp", "node_modules", "data", "content"]
+  exclude_regex = ["_test.go", "_templ.go"]
+  kill_delay = "500ms"
+  send_interrupt = true
+  log = "build-errors.log"
+
+[color]
+  build = "yellow"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  time = false
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true
