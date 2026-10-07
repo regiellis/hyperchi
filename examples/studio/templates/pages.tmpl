@@ -1,0 +1,141 @@
+{{define "page"}}{{with .page}}
+<article class="wrap page">
+  <header class="page-head">
+    <h1>{{.Title}}</h1>
+    <p class="lede">{{.Description}}</p>
+  </header>
+  <div class="prose">{{.Body}}</div>
+</article>
+{{end}}{{end}}
+
+{{define "press"}}{{with .page}}
+<article class="wrap page press">
+  <header class="page-head">
+    <p class="eyebrow">Press</p>
+    <h1>{{.Title}}</h1>
+    <p class="lede">{{.Description}}</p>
+  </header>
+  <div class="press-grid">
+    <div class="prose">{{.Body}}</div>
+    <aside class="fact-sheet" aria-labelledby="studio-facts">
+      <h2 id="studio-facts">Studio facts</h2>
+      <dl>
+        {{- range .Facts}}
+        <div><dt>{{.Label}}</dt><dd>{{.Value}}</dd></div>
+        {{- end}}
+      </dl>
+    </aside>
+  </div>
+  <section class="section" aria-labelledby="logos-heading">
+    <h2 id="logos-heading">Logos</h2>
+    <ul class="download-list">
+      <li><img src="{{asset "/static/img/logo.svg"}}" alt="" width="96" height="96"><a href="{{asset "/static/img/logo.svg"}}" download="driftlamp-logo.svg">Lantern mark and wordmark, SVG</a></li>
+      <li><img src="{{asset "/static/img/favicon.svg"}}" alt="" width="96" height="96"><a href="{{asset "/static/img/favicon.svg"}}" download="driftlamp-icon.svg">Lantern icon, SVG</a></li>
+    </ul>
+  </section>
+  {{- range $.games}}
+  <section class="section press-game" id="{{.Slug}}" aria-labelledby="press-{{.Slug}}">
+    <h2 id="press-{{.Slug}}">{{.Title}}</h2>
+    <div class="press-grid">
+      <div>
+        <p class="lede">{{.Tagline}}</p>
+        <p>{{.Summary}}</p>
+        <ul class="download-list">
+          <li><img src="{{asset .Cover.Src}}" alt="" width="1200" height="630" loading="lazy"><a href="{{asset .Cover.Src}}" download="{{.Slug}}-key-art.svg">Key art, SVG</a></li>
+          {{- range $i, $shot := .Screens}}
+          <li><img src="{{asset $shot.Src}}" alt="" width="1600" height="900" loading="lazy"><a href="{{asset $shot.Src}}" download>Screenshot {{add $i 1}}, SVG</a></li>
+          {{- end}}
+        </ul>
+      </div>
+      <dl class="fact-sheet">
+        {{- range .Facts}}
+        <div><dt>{{.Label}}</dt><dd>{{.Value}}</dd></div>
+        {{- end}}
+      </dl>
+    </div>
+  </section>
+  {{- end}}
+</article>
+{{end}}{{end}}
+
+{{define "careers"}}
+<div class="wrap page">
+  <header class="page-head">
+    <p class="eyebrow">Careers</p>
+    <h1>Work with us</h1>
+    <p class="lede">We hire a few people at a time, remotely, on clear terms with the pay agreed up front. Every role is credited in the game.</p>
+  </header>
+  {{- if .roles}}
+  <ul class="role-list">
+    {{- range .roles}}
+    <li>
+      <article class="role-row">
+        <h2><a href="{{.Path}}">{{.Title}}</a></h2>
+        <p class="role-meta">{{.Kind}}<span aria-hidden="true"> · </span>{{.Location}}</p>
+        <p>{{.Summary}}</p>
+      </article>
+    </li>
+    {{- end}}
+  </ul>
+  {{- else}}
+  <p class="empty">No open roles right now. New ones appear here and in the devlog.</p>
+  {{- end}}
+</div>
+{{end}}
+
+{{define "role"}}{{with .role}}
+<article class="wrap page role">
+  <header class="page-head">
+    <p class="eyebrow"><a href="/careers">Careers</a></p>
+    <h1>{{.Title}}</h1>
+    <p class="lede">{{.Summary}}</p>
+    <dl class="role-facts">
+      <div><dt>Terms</dt><dd>{{.Kind}}</dd></div>
+      <div><dt>Location</dt><dd>{{.Location}}</dd></div>
+      <div><dt>Posted</dt><dd><time datetime="{{.Posted.Format "2006-01-02"}}">{{.Posted.Format "2 January 2006"}}</time></dd></div>
+    </dl>
+  </header>
+  <div class="prose">{{.Body}}</div>
+</article>
+{{end}}{{end}}
+
+{{define "newsletter"}}
+<div class="wrap page newsletter-page">
+  <header class="page-head">
+    <p class="eyebrow">Newsletter</p>
+    <h1>Hear when the ferry sails</h1>
+    <p class="lede">Each devlog post as it goes up, or one email on the day <em>The Lamplit Crossing</em> enters Early Access. You choose.</p>
+  </header>
+  {{template "newsletter-form" .}}
+</div>
+{{end}}
+
+{{define "newsletter-thanks"}}
+<div class="wrap page newsletter-page">
+  <header class="page-head">
+    <p class="eyebrow">Newsletter</p>
+    <h1>You are on the list</h1>
+    <p class="lede">Thank you. This is an example site, so no confirmation email was sent and none will be: your address sits in the site's database and nothing else happens.</p>
+  </header>
+  <p><a class="button button-quiet" href="/devlog">Read the devlog</a></p>
+</div>
+{{end}}
+
+{{/* error renders two ways: inside the layout as a page (OnError sets
+     "full"), and alone as the htmx fragment DefaultError sends. */}}
+{{define "error"}}
+{{- if .full}}
+<section class="wrap error-page" aria-labelledby="error-title">
+  <p class="eyebrow">Error {{.status}}</p>
+  <h1 id="error-title">{{if eq .status 404}}This page drifted off{{else if ge .status 500}}Something went wrong on our side{{else}}That request did not work{{end}}</h1>
+  <p class="lede">{{.message}}</p>
+  <ul class="error-links">
+    <li><a class="button" href="/">Back to the home page</a></li>
+    <li><a class="button button-quiet" href="/games">Games</a></li>
+    <li><a class="button button-quiet" href="/devlog">Devlog</a></li>
+  </ul>
+</section>
+{{- else}}
+<span class="form-alert">{{if eq .status 429}}Too many tries from your connection. Wait a minute, then try again.{{else if eq .status 403}}This form only accepts posts from this site.{{else}}{{.message}}{{end}}</span>
+{{- end}}
+{{end}}

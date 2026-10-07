@@ -1,0 +1,29 @@
+# Homelab search: Air live-reload config. Air's build lands in tmp/ (ignored);
+# the SQLite driver is pure Go, so no C toolchain is needed. Static assets are
+# embedded, so CSS and JS edits rebuild too. The library directory is watched
+# by the app itself, not by Air.
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "CGO_ENABLED=0 go build -o ./tmp/homelab-search ."
+  bin = "./tmp/homelab-search"
+  delay = 500
+  include_ext = ["go", "tmpl", "css", "js", "svg"]
+  exclude_dir = ["tmp", "library"]
+  exclude_regex = ["_test.go"]
+  kill_delay = "500ms"
+  send_interrupt = true
+  log = "build-errors.log"
+
+[log]
+  main_only = false
+  time = false
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true

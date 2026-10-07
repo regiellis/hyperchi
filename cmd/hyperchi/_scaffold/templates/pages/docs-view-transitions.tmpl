@@ -1,0 +1,67 @@
+{{define "docs-view-transitions"}}
+<div class="max-w-6xl mx-auto px-6 py-10 flex gap-12">
+    {{template "sidebar" .}}
+
+    <article class="prose flex-1 max-w-3xl">
+        <h1>View Transitions</h1>
+        <p class="lede">Astro-style cross-page morph, layered on the browser's
+        View Transitions API and htmx 4's built-in transition wrapping.</p>
+
+        <p>You've already seen them: every navigation in this docs site is wrapped in
+        <code>document.startViewTransition</code>, which is why pages cross-fade instead of
+        snapping. The wiring is in three places:</p>
+
+        <ol>
+            <li>The <code>htmx-config</code> meta in <code>base.tmpl</code> sets <code>"transitions": true</code></li>
+            <li>The <code>::view-transition-old/new(root)</code> CSS in <code>src/style.css</code> defines the default fade</li>
+            <li>The <code>hyperchi-view-transitions.js</code> helper in <code>static/js/</code> wires up the data attributes</li>
+        </ol>
+
+        <h2 id="default">Default: automatic cross-fade</h2>
+        <p>You don't need to do anything. With <code>transitions: true</code> and <code>hx-boost</code>
+        on <code>&lt;body&gt;</code>, every htmx swap and every boosted link click animates.</p>
+
+        <h2 id="vt-name">data-vt-name: shared element transitions</h2>
+        <p>Mark elements with the same name on both pages and the browser will morph
+        between them, animating size, position, and any transformable property.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;!-- /products/list --&gt;
+&lt;img data-vt-name=&quot;hero-{{`{{.id}}`}}&quot; src=&quot;...&quot;&gt;
+
+&lt;!-- /products/{{`{{.id}}`}}/show --&gt;
+&lt;img data-vt-name=&quot;hero-{{`{{.id}}`}}&quot; src=&quot;...&quot;&gt;</code></pre>
+        <p>The helper sets <code>style.viewTransitionName = &quot;hero-42&quot;</code> on each
+        marked element. Names must be unique on a given page; usually you template the
+        item ID into the name to make sure of that.</p>
+
+        <h2 id="vt-animate">data-vt-animate: preset keyframes</h2>
+        <p>Two presets ship in <code>style.css</code> by default:</p>
+        <pre class="code-block" data-lang="html"><code>&lt;article data-vt-animate=&quot;slide&quot;&gt;...&lt;/article&gt;
+&lt;section data-vt-animate=&quot;scale&quot;&gt;...&lt;/section&gt;</code></pre>
+        <p>The helper adds a <code>.vt-animate-slide</code> or <code>.vt-animate-scale</code>
+        class hook; the CSS does the rest. Add your own preset by writing more keyframes
+        and matching <code>::view-transition-old/new(.your-class)</code> selectors.</p>
+
+        <h2 id="vt-persist">data-vt-persist: skip the transition</h2>
+        <p>Useful for chrome that's identical across pages: top nav, sidebar, audio player.
+        Same-named regions get the same <code>view-transition-name</code> on every render,
+        which makes the browser see them as the "same" element and elide animation.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;header data-vt-persist&gt;...&lt;/header&gt;
+&lt;aside data-vt-persist=&quot;sidebar&quot;&gt;...&lt;/aside&gt;</code></pre>
+
+        <h2 id="reduced-motion">Reduced motion</h2>
+        <p>The default <code>style.css</code> includes:</p>
+        <pre class="code-block" data-lang="css"><code>@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none !important; }
+}</code></pre>
+        <p>So users with motion-sensitivity OS settings get instant swaps automatically.</p>
+
+        <h2 id="browser-support">Browser support</h2>
+        <p>The View Transitions API is supported in Chromium-based browsers and Safari
+        as of 2024. Firefox is in progress. On unsupported browsers the helper is
+        harmless: htmx swaps without animation, and <code>data-vt-*</code> attributes are no-ops.</p>
+
+        <p class="text-sm pt-6"><a href="/docs/deploy" hx-boost="true">Next: Deploy →</a></p>
+    </article>
+</div>
+{{end}}

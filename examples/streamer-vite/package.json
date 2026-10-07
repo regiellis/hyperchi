@@ -1,0 +1,28 @@
+{
+  "name": "hyperchi-streamer-vite",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "backend": "go run .",
+    "dev:all": "concurrently \"npm run backend\" \"sleep 3 && npm run dev\" --names \"backend,frontend\" --prefix-colors \"blue,green\" --kill-others-on-fail",
+    "dev:manual": "echo 'Start backend: npm run backend (in another terminal)' && npm run dev"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^4.1.11",
+    "vite": "^6.0.3"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@vue/reactivity": "^3.5.13",
+    "animejs": "^4.2.2",
+    "htmx.org": "4.0.0"
+  }
+}

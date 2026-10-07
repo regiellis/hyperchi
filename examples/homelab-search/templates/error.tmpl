@@ -1,0 +1,4 @@
+{{define "error"}}<div class="empty" role="alert">
+  <h2>{{with .message}}{{.}}{{else}}Something went wrong.{{end}}</h2>
+  <p class="meta">Error {{.status}}. <a href="/">Back to the library</a>.</p>
+</div>{{end}}

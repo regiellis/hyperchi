@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ "v*", "cmd/hyperchi/v*" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    name: Go build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        # The go directive is the build minimum (1.26.0, set by x/crypto, x/sys,
+        # x/image, and modernc.org/sqlite), so this job proves it still builds there.
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Go env
+        run: |
+          go env
+          go version
+      - name: Build
+        run: go build ./...
+      - name: Build without cgo
+        # The SQLite driver is pure Go; this keeps a cgo dependency from creeping back.
+        run: CGO_ENABLED=0 go build ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: |
+          mkdir -p coverage
+          go test -race -count=1 -coverprofile=coverage/total.coverprofile ./...
+      - name: Coverage floor
+        # The floor covers the framework module only; the CLI module is tested in its own job.
+        run: sh scripts/coverage-floor.sh coverage/total.coverprofile
+
+  cli:
+    name: CLI module build and test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Separate module; its go.mod replaces the framework with this checkout (../..).
+        working-directory: cmd/hyperchi
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        # Latest 1.26 patch: the generated projects this job compiles ask for 1.26.8.
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          check-latest: true
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            cmd/hyperchi/go.sum
+      - name: Build
+        run: go build ./...
+      - name: Build without cgo
+        run: CGO_ENABLED=0 go build ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        # Generates both project templates, compiles them, and HTTP-tests the result.
+        run: go test -race -count=1 -cover ./...
+
+  lint:
+    name: golangci-lint (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [".", "cmd/hyperchi"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ matrix.module }}/go.mod
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            cmd/hyperchi/go.sum
+      - uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.12.2
+          working-directory: ${{ matrix.module }}
+
+  security:
+    name: Go vulnerability scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # govulncheck judges the standard library of the Go that runs it. Scan with
+      # the latest 1.26 patch release, the toolchain deployments should use;
+      # 1.26.0 (the go directive) has known stdlib advisories fixed in later patches.
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          check-latest: true
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            cmd/hyperchi/go.sum
+      - name: Framework module
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+      - name: CLI module
+        working-directory: cmd/hyperchi
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+
+  frontend:
+    name: Frontend build (if present)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install deps (skip if no package.json)
+        run: |
+          if [ ! -f package.json ]; then echo "No package.json, skipping"; exit 0; fi
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Build (skip if no build script)
+        run: |
+          if [ ! -f package.json ]; then echo "No package.json, skipping"; exit 0; fi
+          if npm run | grep -q " build"; then npm run build; else echo "No build script"; fi

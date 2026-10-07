@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en"
+      hc-data="app()"
+      hc-persist="darkMode:theme"
+      hc-effect="document.documentElement.classList.toggle('dark', !!darkMode); document.body.style.overflow = modalId === null ? '' : 'hidden'"
+      hc-cloak>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title | default "Streamer"}} - A HyperChi Podcast Platform Example</title>
+    <meta name="description" content="{{.description | default "Streamer is a HyperChi example based on the Lexington Themes Astro template, showcasing server-side rendering with HTMX interactivity."}}">
+
+    <!-- HyperChi htmx 4 defaults: htmx 2-compatible inheritance, no auto-swap on
+         error responses, no request timeout. Override per-page if needed. -->
+    <meta name="htmx-config" content='{"implicitInheritance": true, "noSwap": [204, 304, "4xx", "5xx"], "defaultTimeout": 0, "transitions": true}'>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="{{asset "/static/favicon.svg"}}">
+
+    <!-- Typography - Matching Astro original -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+    <!-- Vite assets - conditional loading for dev vs production -->
+    {{if .development}}
+        <!-- Development: Load from Vite dev server -->
+        <script type="module" src="{{.vite_dev_server}}/@vite/client"></script>
+        <script type="module" src="{{.vite_dev_server}}/src/main.js"></script>
+    {{else}}
+        <!-- Production: Load built assets -->
+        <link rel="stylesheet" href="{{asset "/dist/assets/style.css"}}">
+        <script type="module" src="{{asset "/dist/assets/main.js"}}"></script>
+    {{end}}
+
+
+    <!-- Custom CSS for exact Astro styling -->
+    <style>
+        /* HyperChi hc-cloak directive to prevent flashing */
+        [hc-cloak] { display: none !important; }
+
+        /* Typography stylistic sets for Inter - matching Astro original */
+        :root {
+            font-feature-settings:
+                "tnum" 1,
+                "zero" 1,
+                "cv01" 1,
+                "cv09" 1,
+                "cv02" 1,
+                "cv03" 1,
+                "cv04" 1,
+                "ss08" 1,
+                "dlig" 1,
+                "cv06" 1,
+                "cv10" 1,
+                "cv13" 1;
+        }
+
+        @supports (font-variation-settings: normal) {
+            :root {
+                font-family: InterVariable, sans-serif;
+            }
+        }
+
+        /* Scrollbar hide for modal */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-base-light dark:bg-neutral-950 p-8" hx-boost:inherited="true">
+    {{.content}}
+
+    <!-- Footer - Matching Astro exactly with scroll animation -->
+    <footer class="text-xs pb-8 pt-48" data-anime-extension="scroll" data-scroll-preset="fadeIn" data-scroll-threshold="0.1">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            <div class="gap-4 flex flex-col">
+                <div class="gap-1 flex flex-col">
+                    <p class="text-sm font-serif italic text-black dark:text-neutral-500">Follow us on</p>
+                    <a href="#_" class="text-xs dark:text-neutral-500 underline">Twitter</a>
+                </div>
+                <div class="gap-1 flex flex-col">
+                    <p class="text-sm font-serif italic text-black dark:text-neutral-500">Add us on</p>
+                    <a href="#_" class="text-xs dark:text-neutral-500 underline">LinkedIn</a>
+                </div>
+            </div>
+            <div>
+                <p class="text-base font-serif italic text-black dark:text-white">Attributions</p>
+                <p class="text-xs text-neutral-500 mt-1">
+                    This design template was originally created by <a href="https://lexingtonthemes.com" class="dark:text-neutral-500 text-black underline">Lexington Themes</a> for Astro.
+                    It has been converted to HyperChi to showcase the framework's capabilities while maintaining the original Swiss design aesthetic.
+                </p>
+            </div>
+            <div>
+                <p class="text-base font-serif italic text-black dark:text-white">Colophon</p>
+                <p class="text-xs text-neutral-500 mt-1">
+                    This site demonstrates HyperChi, a Go microframework that combines server-side rendering with HTMX for React-like interactivity.
+                    Built with Swiss design principles using Instrument Serif, Inter fonts, and Tailwind CSS.
+                    <a href="https://github.com/regiellis/hyperchi" class="dark:text-neutral-500 text-black underline">HyperChi is open source</a>.
+                </p>
+            </div>
+            <div>
+                <p class="text-base font-serif italic text-black dark:text-white">Thank you</p>
+                <p class="text-xs text-neutral-500 mt-1">
+                    Thank you for exploring HyperChi! This is my personal, opinionated microframework built on Go that brings React-like patterns to server-side development.
+                    I believe in simple, powerful tools that make web development enjoyable again.
+                </p>
+            </div>
+            <p class="text-base flex flex-col text-black dark:text-white font-serif gap-1 italic">
+                Original Design
+                <span class="text-neutral-500 text-xs">
+                    <a href="https://lexingtonthemes.com" class="hover:underline">Lexington Themes</a> •
+                    <a href="https://github.com/regiellis/hyperchi" class="hover:underline">HyperChi</a> •
+                    <a href="https://github.com/regiellis" class="hover:underline">@regiellis</a>
+                </span>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,53 @@
+{{define "home"}}
+{{with .flagship}}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">New from {{$.site.Name}}<span aria-hidden="true"> · </span><span class="status status-{{.StatusKind}}">{{.Status}}</span></p>
+      <h1 id="hero-title">{{.Title}}</h1>
+      <p class="lede">{{.Tagline}}</p>
+      <div class="actions">
+        {{- with index .Stores 0}}
+        <a class="button" href="{{.URL}}" rel="external">{{if eq $.flagship.StatusKind "released"}}Buy on{{else}}Wishlist on{{end}} {{.Label}}</a>
+        {{- end}}
+        <a class="button button-quiet" href="{{.Path}}">About the game</a>
+      </div>
+      <p class="platforms">{{join .Platforms " · "}}</p>
+    </div>
+    <figure class="hero-art">
+      <img src="{{asset .Cover.Src}}" alt="{{.Cover.Alt}}" width="1200" height="630" fetchpriority="high">
+    </figure>
+  </div>
+</section>
+{{end}}
+
+<section class="wrap section" aria-labelledby="games-heading">
+  <div class="section-head">
+    <h2 id="games-heading">Our games</h2>
+    <a class="section-link" href="/games">All games <span aria-hidden="true">→</span></a>
+  </div>
+  <ul class="game-grid">
+    {{- range .games}}{{template "game-card" .}}{{end}}
+  </ul>
+</section>
+
+<section class="wrap section" aria-labelledby="devlog-heading">
+  <div class="section-head">
+    <h2 id="devlog-heading">From the devlog</h2>
+    <a class="section-link" href="/devlog">Every post <span aria-hidden="true">→</span></a>
+  </div>
+  <ol class="post-list post-list-home">
+    {{- range .posts}}{{template "post-item" (dict "post" . "hx" false)}}{{end}}
+  </ol>
+</section>
+
+<section class="newsletter-band" aria-labelledby="newsletter-heading">
+  <div class="wrap newsletter-grid">
+    <div class="newsletter-copy">
+      <h2 id="newsletter-heading">Hear when the ferry sails</h2>
+      <p>Get each devlog post as it goes up, or one email on the day <em>The Lamplit Crossing</em> enters Early Access. Nothing else.</p>
+    </div>
+    {{template "newsletter-form" .}}
+  </div>
+</section>
+{{end}}
