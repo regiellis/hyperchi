@@ -1,0 +1,129 @@
+{{define "docs-deploy"}}
+<div class="max-w-6xl mx-auto px-6 py-10 flex gap-12">
+    {{template "sidebar" .}}
+
+    <article class="prose flex-1 max-w-3xl">
+        <h1>Deploy</h1>
+        <p class="lede">One static binary plus a <code>dist/</code> directory.
+        That's it: no node runtime in production, no separate frontend service.</p>
+
+        <h2 id="build">task build</h2>
+        <p>Two steps, run for you by the bundled Taskfile:</p>
+        <pre class="code-block" data-lang="bash"><code>$ task build
+# 1. npm run build    → dist/assets/{main.js, style.css, ...}
+# 2. go build -ldflags='-s -w' -o bin/app .
+# Built bin/app (12M)</code></pre>
+        <p>The Go binary doesn't read <code>node_modules/</code> at runtime; everything
+        the browser needs is in <code>dist/assets/</code>. <code>-s -w</code> strips the
+        debug table so the binary is meaningfully smaller (~30% in our experience).</p>
+
+        <h2 id="serve">task serve</h2>
+        <pre class="code-block" data-lang="bash"><code>$ task serve
+# sets PRODUCTION=true and runs ./bin/app</code></pre>
+        <p>The <code>PRODUCTION=true</code> env var flips the
+        <code>{{`{{if .development}}`}}</code> branch in <code>base.tmpl</code> from "load
+        from Vite dev server" to "load from <code>/dist/assets/</code>". So the same
+        templates work in both modes.</p>
+
+        <h2 id="env-vars">Environment variables</h2>
+        <table class="text-sm border-collapse w-full my-4">
+            <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800">
+                    <th class="text-left font-medium py-2 pr-4">Variable</th>
+                    <th class="text-left font-medium py-2 pr-4">Default</th>
+                    <th class="text-left font-medium py-2">Purpose</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-600 dark:text-slate-400">
+                <tr class="border-b border-slate-100 dark:border-slate-900">
+                    <td class="py-2 pr-4 font-mono text-xs">PORT</td>
+                    <td class="py-2 pr-4 font-mono text-xs">8080</td>
+                    <td class="py-2">HTTP listen port</td>
+                </tr>
+                <tr class="border-b border-slate-100 dark:border-slate-900">
+                    <td class="py-2 pr-4 font-mono text-xs">PRODUCTION</td>
+                    <td class="py-2 pr-4 font-mono text-xs">false</td>
+                    <td class="py-2">Switches templates to <code>/dist/</code> assets</td>
+                </tr>
+                <tr>
+                    <td class="py-2 pr-4 font-mono text-xs">VITE_DEV_SERVER</td>
+                    <td class="py-2 pr-4 font-mono text-xs">http://localhost:3000</td>
+                    <td class="py-2">Where dev mode loads JS/CSS from</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 id="output">What's in dist/</h2>
+        <pre class="code-block" data-lang="bash"><code>dist/
+└── assets/
+    ├── main.js        # Vite bundle of src/main.js (htmx + your code)
+    └── style.css      # Tailwind output (only classes you actually used)</code></pre>
+        <p>The vendored runtime files in <code>static/js/</code> (<code>hyperchi-directives.js</code>
+        and <code>hyperchi-view-transitions.js</code>) are served as-is by the Go server.
+        They don't go through Vite.</p>
+
+        <h2 id="docker">Docker</h2>
+        <p>Two-stage build with a static binary:</p>
+        <details class="code-gate">
+            <summary>Show Dockerfile</summary>
+            <pre class="code-block" data-lang="dockerfile"><code># --- frontend stage ---
+FROM node:20-alpine AS frontend
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# --- go stage ---
+FROM golang:1.26-alpine AS backend
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+COPY --from=frontend /app/dist ./dist
+RUN CGO_ENABLED=0 go build -ldflags='-s -w' -o /out/app .
+
+# --- runtime ---
+FROM gcr.io/distroless/static
+COPY --from=backend /out/app /app
+COPY --from=backend /app/dist /dist
+COPY --from=backend /app/static /static
+COPY --from=backend /app/templates /templates
+ENV PRODUCTION=true PORT=8080
+EXPOSE 8080
+USER nonroot
+ENTRYPOINT ["/app"]</code></pre>
+        </details>
+
+        <h2 id="hosts">Hosting shapes</h2>
+        <ul>
+            <li><strong>VM (Hetzner, EC2, droplet)</strong>: copy the binary, the
+            <code>dist/</code>, <code>static/</code>, <code>templates/</code> dirs;
+            run under systemd. Smallest moving parts.</li>
+            <li><strong>Fly.io / Railway / Render</strong>: a Dockerfile like the one
+            above plus a port env var. Both honor <code>PORT</code> automatically.</li>
+            <li><strong>Behind a CDN</strong>: point the CDN at the Go server; cache
+            <code>/dist/*</code> and <code>/static/*</code> aggressively, leave HTML
+            uncached. The Go process becomes the origin.</li>
+        </ul>
+
+        <h2 id="security">Production checklist</h2>
+        <ul>
+            <li>Set a strong CSP. The default in <code>middleware.Security()</code>
+            permits <code>'unsafe-eval'</code> because the directive engine and
+            <code>hx-on</code> attributes use <code>new Function()</code>.</li>
+            <li>Keep CSRF protection on. <code>app.AutoMiddleware()</code> installs it,
+            and the layout sends <code>.csrfToken</code> with every htmx request.</li>
+            <li>Run tests in CI: <code>go test ./...</code></li>
+            <li>Set <code>ENVIRONMENT=production</code> at the supervisor level, not in code,
+            and a <code>SECRET_KEY</code> of 32 bytes or more if the app signs cookies or uses flash messages.</li>
+        </ul>
+
+        <p class="text-sm pt-6">
+            <a href="/" hx-boost="true">← Back to start</a>
+            &nbsp;·&nbsp;
+            <a href="/docs/directives" hx-boost="true">Re-read directives</a>
+        </p>
+    </article>
+</div>
+{{end}}

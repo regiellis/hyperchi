@@ -1,0 +1,63 @@
+{{define "docs.tmpl"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>{{template "site-head" .}}{{with .page}}
+<link rel="alternate" type="text/markdown" href="{{.MarkdownPath}}">{{end}}
+<link rel="describedby" href="/llms.txt">
+</head>
+<body hc-data="site()" hc-on:keydown="shortcut($event)" id="top">
+{{template "site-nav" .}}
+<main id="main" class="docs-layout">
+  <aside class="docs-sidebar" aria-label="Documentation navigation">
+    <p>THE HYPERCHI FIELD GUIDE</p>
+    <label class="sr-only" for="docs-search">Filter documentation topics</label><input class="docs-search" id="docs-search" type="search" placeholder="Find a topic…" hc-model="query">
+    <nav aria-label="Topics">{{range .sections}}
+      <p class="docs-group" hc-show="!query">{{.Name}}</p>{{range .Pages}}
+      <a href="{{.Path}}" hc-show="matches('{{.Title}}')" {{if eq $.topic .Slug}}aria-current="page"{{end}}>{{.Title}}</a>{{end}}{{end}}
+    </nav>
+    <div class="docs-empty" hc-show="noResults" hc-cloak role="status">No matching topics.</div>
+    <a class="sidebar-home" href="/#playground">← Back to the playground</a>
+    <a class="sidebar-home" href="https://pkg.go.dev/github.com/regiellis/hyperchi/hyperchi">Full Go API reference ↗</a>
+    <a class="sidebar-home" href="/llms.txt">llms.txt for AI assistants</a>
+  </aside>
+  <article class="docs-article">
+    <form class="docs-searchbar" role="search" action="/docs/search" method="get">
+      <label class="sr-only" for="docs-q">Search the documentation</label>
+      <input id="docs-q" name="q" type="search" maxlength="80" value="{{.query}}" placeholder="Search the docs" autocomplete="off" spellcheck="false"
+             aria-keyshortcuts="/ Control+K Meta+K" aria-controls="docs-search-results"
+             hx-get="/docs/search" hx-trigger="input changed delay:250ms, search" hx-target="#docs-search-results"
+             hc-on:keydown="searchKeydown($event)">
+      <kbd class="docs-search-key" aria-hidden="true">/</kbd>
+      <div id="docs-search-results" class="docs-search-results"></div>
+    </form>
+    {{with .page}}
+    <p class="eyebrow">Documentation / {{.Title}}</p>
+    <h1>{{.Title}}</h1>
+    <p class="lede">{{.Lede}}</p>
+    <div class="docs-actions" role="group" aria-label="Page actions">
+      <button type="button" data-markdown="{{.MarkdownPath}}" hc-on:click="copyPage($event)">Copy page</button>
+      <a href="{{.MarkdownPath}}">View as Markdown</a>
+      <a href="{{$.claudeURL}}" target="_blank" rel="noopener noreferrer">Open in Claude <span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span></a>
+      <a href="{{$.chatgptURL}}" target="_blank" rel="noopener noreferrer">Open in ChatGPT <span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span></a>
+    </div>
+    {{.Body}}
+    <div class="docs-next"><a href="https://github.com/regiellis/hyperchi/tree/main/examples/showcase">View this site’s source ↗</a><a href="{{.NextPath}}">{{.NextLabel}} →</a></div>
+    {{else}}
+    <p class="eyebrow">Documentation / Search</p>
+    <h1>Search</h1>
+    <div class="docs-search-page">{{template "docs-search-results" .}}</div>
+    {{end}}
+  </article>
+  <aside class="docs-toc" aria-label="On this page">{{with .page}}<p>ON THIS PAGE</p>{{range .TOC}}<a href="#{{.ID}}">{{.Text}}</a>{{end}}{{end}}</aside>
+</main>
+<p class="sr-only" aria-live="polite" hc-text="copyStatus"></p>
+{{template "site-footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>
+{{end}}
+
+{{define "docs-search-results"}}{{if not .query}}<p class="search-hint">Search page titles, headings, and text across the documentation. Press <kbd>/</kbd> or <kbd>Ctrl</kbd> <kbd>K</kbd> from any docs page.</p>{{else if .results}}<p class="search-count" role="status">{{len .results}} {{if eq (len .results) 1}}result{{else}}results{{end}} for “{{.query}}”</p>
+<ol class="search-results">{{range .results}}
+  <li><a href="{{.URL}}"><span class="search-page">{{.Page}}</span><span class="search-heading">{{.Heading}}</span></a><p>{{.Snippet}}</p></li>{{end}}
+</ol>{{else}}<p class="search-empty" role="status">No results for “{{.query}}”. Try an API name such as <code>Bind</code> or a topic such as templates.</p>{{end}}{{end}}

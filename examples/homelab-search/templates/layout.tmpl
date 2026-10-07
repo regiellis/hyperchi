@@ -1,0 +1,62 @@
+{{define "layout-base"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{with .title}}{{.}} · {{end}}Homelab search</title>
+<meta name="htmx-config" content='{"transitions":false}'>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/app.css">
+<script src="/static/js/theme.js"></script>
+{{/* In <head> with defer, not at the end of <body>: htmx 4 restores history by
+     swapping the body, and scripts there would run a second time. */}}
+<script defer src="/static/js/htmx.min.js"></script>
+<script defer src="/hyperchi/js/hx-sse.js"></script>
+<script defer src="/static/js/hyperchi-directives.js"></script>
+<script defer src="/static/js/app.js"></script>
+</head>
+<body hc-data="app()" hc-on:keydown="onKey($event)">
+<a class="skip" href="#main">Skip to results</a>
+<header class="bar">
+  <a class="brand" href="/">homelab<span>/</span>search</a>
+  <form id="search" class="search" role="search" action="/" method="get"
+        hx-get="/" hx-target="#main" hx-trigger="input delay:200ms, submit" hx-sync="this:replace" hx-indicator="#search-indicator">
+    <div class="field">
+      <label class="sr-only" for="q">Search the library</label>
+      <input id="q" name="q" type="search" value="{{.q}}" placeholder="Search manuals, notes, configs" autocomplete="off" spellcheck="false" maxlength="200" aria-keyshortcuts="/" aria-controls="main">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <label class="sr-only" for="type">Document type</label>
+    <select id="type" name="type">
+      <option value="">All types</option>
+      {{range .types}}<option value="{{.Name}}"{{if eq .Name (print $.type)}} selected{{end}}>{{.Name}} ({{.Count}})</option>{{end}}
+    </select>
+    <label class="sr-only" for="tag">Tag</label>
+    <select id="tag" name="tag">
+      <option value="">All tags</option>
+      {{range .tags}}<option value="{{.Name}}"{{if eq .Name (print $.tag)}} selected{{end}}>#{{.Name}} ({{.Count}})</option>{{end}}
+    </select>
+    <span id="search-indicator" class="indicator" aria-hidden="true"></span>
+    <noscript><button class="btn" type="submit">Search</button></noscript>
+  </form>
+  <button class="icon-btn" type="button" hc-on:click="toggleTheme()" hc-bind:aria-pressed="theme === 'light'" aria-pressed="false" aria-label="Light theme"><span aria-hidden="true">◐</span></button>
+</header>
+<div class="shell">
+  <main id="main" tabindex="-1">{{.content}}</main>
+  <aside class="side" aria-label="Library">
+    <section id="index-status" {{sseConnect "/events?channels=index-status"}} hx-swap="innerHTML">{{template "index-status-body" .}}</section>
+    <section class="keys" aria-labelledby="keys-heading">
+      <h2 id="keys-heading">Keys</h2>
+      <dl>
+        <dt><kbd>/</kbd></dt><dd>Search</dd>
+        <dt><kbd>j</kbd> <kbd>↓</kbd></dt><dd>Next result</dd>
+        <dt><kbd>k</kbd> <kbd>↑</kbd></dt><dd>Previous result</dd>
+        <dt><kbd>Enter</kbd></dt><dd>Open</dd>
+        <dt><kbd>Esc</kbd></dt><dd>Leave the search box</dd>
+      </dl>
+    </section>
+  </aside>
+</div>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,21 @@
+# Air hot reload for Dice Arena: `task dev` or `air`. Templates and static
+# files are embedded, so template, CSS, and JS edits rebuild too.
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/dice-arena ."
+  entrypoint = ["./tmp/dice-arena"]
+  include_ext = ["go", "tmpl", "css", "js", "svg"]
+  exclude_dir = ["tmp"]
+  exclude_regex = ["_test\\.go$"]
+  delay = 300
+  stop_on_error = true
+  send_interrupt = true
+  kill_delay = "2s"
+
+[log]
+  time = false
+
+[misc]
+  clean_on_exit = true

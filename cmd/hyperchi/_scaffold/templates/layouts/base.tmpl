@@ -1,0 +1,71 @@
+{{define "layout-base"}}<!DOCTYPE html>
+<html lang="en"
+      hc-data="app()"
+      hc-persist="darkMode:theme"
+      hc-effect="document.documentElement.classList.toggle('dark', !!darkMode)"
+      hc-cloak>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title | default "HyperChi"}}</title>
+
+    <!-- htmx 4 defaults: htmx 2-compatible inheritance, no auto-swap on errors,
+         no request timeout, View Transitions on. -->
+    <meta name="htmx-config" content='{"implicitInheritance": true, "noSwap": [204, 304, "4xx", "5xx"], "defaultTimeout": 0, "transitions": true}'>
+
+    {{if .development}}
+        <script type="module" src="{{.vite_dev_server}}/@vite/client"></script>
+        <script type="module" src="{{.vite_dev_server}}/src/main.js"></script>
+    {{else}}
+        <link rel="stylesheet" href="/dist/assets/style.css">
+        <script type="module" src="/dist/assets/main.js"></script>
+    {{end}}
+
+    <!-- HyperChi runtime (vendored copies, embedded by the CLI at scaffold time) -->
+    <script src="/static/js/hyperchi-directives.js"></script>
+    <script src="/static/js/hyperchi-view-transitions.js"></script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col" hx-boost:inherited="true"{{with .csrfToken}} hx-headers:inherited='{"X-CSRF-Token": "{{.}}"}'{{end}}>
+
+    <!-- Top bar -->
+    <header class="border-b border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-950/70 backdrop-blur-sm sticky top-0 z-10">
+        <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+            <a href="/" class="font-serif italic text-xl text-slate-900 dark:text-white" hx-boost="true">hyperchi</a>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="/docs/directives" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Docs</a>
+                <a href="https://github.com/regiellis/hyperchi" target="_blank" rel="noopener" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">GitHub</a>
+                <button hc-on:click="toggleTheme()"
+                        class="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-400"
+                        aria-label="Toggle theme">
+                    <span hc-show="!darkMode">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                    </span>
+                    <span hc-show="darkMode">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+                    </span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        {{.content}}
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 mt-16">
+        <div class="max-w-6xl mx-auto px-6 py-6 text-xs text-slate-500 flex justify-between items-center">
+            <span>Scaffolded with <code class="font-mono">hyperchi new</code>. <a href="/docs/deploy" class="underline" hx-boost="true">Ready to ship</a>.</span>
+            <span>Go + HTMX 4 + Tailwind v4</span>
+        </div>
+    </footer>
+
+    <script>
+      HyperChi.registerComponent('app', () => ({
+        darkMode: false,
+        toggleTheme() { this.darkMode = !this.darkMode },
+      }))
+      HyperChi.start()
+    </script>
+</body>
+</html>
+{{end}}

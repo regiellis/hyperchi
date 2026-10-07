@@ -1,0 +1,256 @@
+/* Tailwind CSS v4 entry point for HyperChi. Configuration lives in CSS:
+ * @plugin loads @tailwindcss/forms, @source lists the files to scan, and
+ * @theme holds the theme.
+ */
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+/* Files Tailwind scans for class names. */
+@source "../**/*.{js,ts,css}";
+@source "../../../examples/**/*.{html,tmpl,go}";
+@source "../../../hyperchi/**/*.go";
+
+/* Theme tokens */
+@theme {
+    --color-hyperchi-50:  #f0f9ff;
+    --color-hyperchi-100: #e0f2fe;
+    --color-hyperchi-200: #bae6fd;
+    --color-hyperchi-300: #7dd3fc;
+    --color-hyperchi-400: #38bdf8;
+    --color-hyperchi-500: #0ea5e9;
+    --color-hyperchi-600: #0284c7;
+    --color-hyperchi-700: #0369a1;
+    --color-hyperchi-800: #075985;
+    --color-hyperchi-900: #0c4a6e;
+
+    --spacing-18: 4.5rem;
+    --spacing-88: 22rem;
+
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================================================================
+ * Base layer
+ * ============================================================================ */
+@layer base {
+    body {
+        @apply font-sans text-gray-900 bg-gray-50 leading-relaxed;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-semibold text-gray-900;
+    }
+}
+
+/* ============================================================================
+ * Components
+ * ============================================================================ */
+@layer components {
+    /* HTMX loading states */
+    .loading {
+        @apply opacity-70 pointer-events-none relative;
+    }
+    .loading::after {
+        content: '';
+        @apply absolute top-1/2 left-1/2 w-5 h-5 -mt-2.5 -ml-2.5
+               border-2 border-gray-200 border-t-blue-600 rounded-full
+               animate-spin;
+    }
+    .htmx-request {
+        @apply cursor-wait;
+    }
+
+    /* User card */
+    .user-card {
+        @apply bg-white border border-gray-200 rounded-lg p-4 my-3
+               shadow-sm transition-all duration-200 hover:shadow-md
+               hover:-translate-y-0.5;
+    }
+    .user-card.light-theme {
+        @apply bg-white text-gray-900;
+    }
+    .user-card.dark-theme {
+        @apply bg-gray-800 text-white border-gray-700;
+    }
+    .user-card h3 {
+        @apply text-lg font-semibold mb-2;
+    }
+    .user-card p {
+        @apply text-sm text-gray-600 my-1;
+    }
+    .user-card.dark-theme p {
+        @apply text-gray-300;
+    }
+    .user-card button {
+        @apply bg-hyperchi-500 hover:bg-hyperchi-600 text-white
+               px-4 py-2 rounded transition-colors duration-200 mt-2
+               disabled:bg-gray-500 disabled:cursor-not-allowed;
+    }
+
+    /* Data table */
+    .data-table {
+        @apply bg-white rounded-lg overflow-hidden shadow-sm my-4;
+    }
+    .data-table table {
+        @apply w-full;
+    }
+    .data-table th {
+        @apply bg-gray-50 px-4 py-3 text-left font-semibold text-gray-900
+               border-b-2 border-gray-200;
+    }
+    .data-table th[data-sortable] {
+        @apply cursor-pointer select-none hover:bg-gray-100;
+    }
+    .data-table td {
+        @apply px-4 py-3 border-b border-gray-100;
+    }
+    .data-table tr:hover {
+        @apply bg-gray-50;
+    }
+
+    /* Form */
+    .form-component {
+        @apply bg-white p-6 rounded-lg shadow-sm my-4;
+    }
+    .form-component .form-group {
+        @apply mb-4;
+    }
+    .form-component label {
+        @apply block mb-1 font-medium text-gray-700;
+    }
+    .form-component input:not([type="checkbox"]):not([type="radio"]),
+    .form-component textarea,
+    .form-component select {
+        @apply w-full px-3 py-2 border border-gray-300 rounded
+               focus:outline-none focus:ring-2 focus:ring-hyperchi-500
+               focus:border-hyperchi-500 transition-colors duration-200;
+    }
+    .form-component button[type="submit"] {
+        @apply bg-hyperchi-500 hover:bg-hyperchi-600 text-white
+               px-5 py-2.5 rounded transition-colors duration-200
+               disabled:bg-gray-500 disabled:cursor-not-allowed;
+    }
+
+    /* Navigation */
+    .nav-component {
+        @apply bg-white border-b border-gray-200 py-3;
+    }
+    .nav-component ul {
+        @apply list-none m-0 p-0 flex gap-4;
+    }
+    .nav-component a {
+        @apply text-gray-700 no-underline px-4 py-2 rounded
+               transition-colors duration-200 hover:bg-gray-100;
+    }
+    .nav-component a.active {
+        @apply bg-hyperchi-500 text-white;
+    }
+
+    /* Card */
+    .card-component {
+        @apply bg-white rounded-lg p-5 shadow-sm my-4;
+    }
+    .card-component .card-header {
+        @apply border-b border-gray-200 mb-4 pb-3;
+    }
+    .card-component .card-title {
+        @apply text-xl font-semibold m-0;
+    }
+    .card-component .card-body {
+        @apply text-gray-600;
+    }
+
+    /* Alert */
+    .alert-component {
+        @apply px-4 py-3 rounded my-4 border-l-4;
+    }
+    .alert-component.success {
+        @apply bg-green-50 border-green-400 text-green-800;
+    }
+    .alert-component.error {
+        @apply bg-red-50 border-red-400 text-red-800;
+    }
+    .alert-component.warning {
+        @apply bg-yellow-50 border-yellow-400 text-yellow-800;
+    }
+    .alert-component.info {
+        @apply bg-blue-50 border-blue-400 text-blue-800;
+    }
+
+    /* Modal */
+    .modal-component {
+        @apply hidden fixed inset-0 bg-black/50 z-50;
+    }
+    .modal-component.show {
+        @apply flex items-center justify-center;
+    }
+    .modal-content {
+        @apply bg-white rounded-lg p-6 max-w-lg w-11/12 max-h-screen overflow-y-auto;
+    }
+
+    /* Dropdown */
+    .dropdown-component {
+        @apply relative inline-block;
+    }
+    .dropdown-menu {
+        @apply hidden absolute top-full left-0 bg-white border
+               border-gray-200 rounded shadow-lg z-20 min-w-40;
+    }
+    .dropdown-menu.show {
+        @apply block;
+    }
+    .dropdown-menu a {
+        @apply block px-4 py-2 text-gray-700 no-underline
+               transition-colors duration-200 hover:bg-gray-100;
+    }
+
+    /* Tabs */
+    .tabs-component {
+        @apply my-4;
+    }
+    .tab-list {
+        @apply flex border-b border-gray-200 mb-4;
+    }
+    .tab-list [data-tab] {
+        @apply px-6 py-3 bg-transparent border-0 cursor-pointer
+               border-b-2 border-transparent transition-all duration-200
+               hover:bg-gray-50;
+    }
+    .tab-list [data-tab].active {
+        @apply border-b-hyperchi-500 text-hyperchi-500;
+    }
+    .tab-panel {
+        @apply hidden;
+    }
+    .tab-panel.active {
+        @apply block;
+    }
+
+    /* Fade classes for hc-transition enter and leave. */
+    .hc-fade-enter        { @apply opacity-0; }
+    .hc-fade-enter-active { @apply transition-opacity duration-300; }
+    .hc-fade-enter-to     { @apply opacity-100; }
+    .hc-fade-leave        { @apply opacity-100; }
+    .hc-fade-leave-active { @apply transition-opacity duration-300; }
+    .hc-fade-leave-to     { @apply opacity-0; }
+}
+
+/* Directive cloak. It sits outside any @layer because unlayered rules beat
+ * layered ones, so no component display rule can show a cloaked element. */
+[hc-cloak] {
+    display: none !important;
+}
+
+/* ============================================================================
+ * Responsive utilities
+ * ============================================================================ */
+@layer utilities {
+    @media (max-width: 768px) {
+        .user-card    { @apply my-2 p-3; }
+        .data-table   { @apply overflow-x-auto; }
+        .nav-component ul { @apply flex-col gap-2; }
+        .modal-content    { @apply m-4 w-auto; }
+        .tab-list         { @apply flex-wrap; }
+        .tab-list [data-tab] { @apply px-4 py-2; }
+    }
+}

@@ -1,0 +1,14 @@
+version: '3'
+tasks:
+  dev:
+    desc: Run the Go server
+    cmds: [go run .]
+  check:
+    cmds: [go vet ./..., go test -race ./...]
+  build:
+    cmds: [go build -trimpath -o bin/site .]
+  serve:
+    deps: [build]
+    env:
+      ENVIRONMENT: production
+    cmds: [./bin/site]
