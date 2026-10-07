@@ -15,7 +15,7 @@ jobs:
     name: Go build and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Go
         # The go directive is the build minimum (1.26.0, set by x/crypto, x/sys,
         # x/image, and modernc.org/sqlite), so this job proves it still builds there.
@@ -50,7 +50,7 @@ jobs:
         # Separate module; its go.mod replaces the framework with this checkout (../..).
         working-directory: cmd/hyperchi
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Go
         # Latest 1.26 patch: the generated projects this job compiles ask for 1.26.8.
         uses: actions/setup-go@v5
@@ -79,7 +79,7 @@ jobs:
       matrix:
         module: [".", "cmd/hyperchi"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-go@v5
         with:
           go-version-file: ${{ matrix.module }}/go.mod
@@ -96,7 +96,7 @@ jobs:
     name: Go vulnerability scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # govulncheck judges the standard library of the Go that runs it. Scan with
       # the latest 1.26 patch release, the toolchain deployments should use;
       # 1.26.0 (the go directive) has known stdlib advisories fixed in later patches.
@@ -121,7 +121,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
