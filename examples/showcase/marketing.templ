@@ -1,0 +1,43 @@
+package main
+
+templ marketingHead(title string) {
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>{ title }</title>
+	<meta name="htmx-config" content='{"defaultTimeout":10000}'/>
+	<meta name="description" content="A complete marketing page built with HyperChi and templ. Explore the live project estimate and its source code."/>
+	<link rel="stylesheet" href="/static/css/marketing.css"/>
+	<script defer src="/static/js/htmx.min.js"></script>
+	<script defer src="/static/js/marketing.js"></script>
+}
+
+templ estimateCard(e studioEstimate) {
+	<div class="estimate-result">
+		<p class="label">{ e.Scope }</p>
+		<p class="price">{ e.Price }</p>
+		<p>{ e.Timeline } · Indicative project budget</p>
+		<p>{ e.Includes }</p>
+	</div>
+}
+
+templ studioPage(e studioEstimate) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>@marketingHead("Form & Field | A clearer point of view")</head>
+		<body class="studio" id="top">
+			<a class="skip" href="#main">Skip to content</a>
+			<div class="example-bar"><a href="/docs/integrations">← HyperChi examples</a><span>templ + htmx</span><a href="/docs/templ">How this works ↗</a></div>
+			<header class="marketing-nav wrap"><a class="wordmark" href="#top">form<span>&</span>field</a><nav aria-label="Main"><a href="#work">Work</a><a href="#approach">Approach</a><a href="#estimate">Plan a project ↗</a></nav></header>
+			<main id="main">
+				<section class="studio-hero wrap"><p class="label">Independent design studio</p><h1>A clearer<br/>point of view.</h1><div class="hero-bottom"><p>We turn thoughtful businesses into brands people understand, remember, and choose.</p><a class="button" href="#work">Explore our work ↗</a></div><img class="hero-image" src="/static/img/examples/studio.webp" width="1600" height="1067" alt="A black task lamp against a pale green studio wall" fetchpriority="high"/></section>
+				<section class="studio-intro wrap" id="approach"><p class="label">Good work starts with a good question</p><h2>What makes you<br/>worth choosing?</h2><div><p class="large-copy">Before the logo, before the website, before a single line of code: a point of view.</p><p>We help small teams find theirs. Then we make it tangible through an identity, a website, and the everyday details that hold a brand together.</p></div></section>
+				<section class="wrap work-section" id="work"><h2>Ideas, made useful.</h2><p>Two illustrative project directions from our fictional studio portfolio.</p><div class="work-grid"><article class="project project-one"><span>Brand strategy / Identity</span><h3>Everyday<br/>Assembly</h3><p>A fresh perspective for a furniture workshop that believes better objects belong in everyday life.</p><a href="#services">Explore identity services ↗</a></article><article class="project project-two"><span>Digital strategy / Website</span><h3>Room<br/>to grow.</h3><p>A welcoming digital home for an independent practice with a bigger story to tell.</p><a href="#estimate">Explore a website project ↗</a></article></div></section>
+				<section class="wrap service-section" id="services"><h2>One connected practice.</h2><div class="service-list"><article><h3>Find the story</h3><p>Research, positioning, and messaging. A shared direction your team can actually use.</p></article><article><h3>Build the identity</h3><p>Art direction, typography, and a visual system. Enough structure to stay consistent, enough freedom to grow.</p></article><article><h3>Bring it online</h3><p>A fast, accessible website with a clear job to do. Designed and developed as one continuous process.</p></article></div></section>
+				<section class="wrap process-section"><h2>A small team.<br/>A shared process.</h2><ol class="process"><li><h3>Listen closely</h3><p>We meet the people behind the business and work out what the next chapter needs.</p></li><li><h3>Make it tangible</h3><p>We explore a focused direction in real applications, so decisions happen in context.</p></li><li><h3>Leave you ready</h3><p>We deliver the files, the website, and the guidance to make the work your own.</p></li></ol></section>
+				<section class="estimate-section wrap" id="estimate"><div><p class="label">Make a little room for what is next</p><h2>Start with<br/>a clear scope.</h2><p>Explore an illustrative budget. These are example prices, not an offer or a booking.</p><form method="get" action="/examples/templ#estimate" hx-get="/examples/templ/estimate" hx-target="#estimate-result" hx-indicator="#estimate-loading"><label for="scope">What are you working on?</label><select id="scope" name="scope"><option value="launch" selected?={ e.Scope == "Launch website" }>Launch website</option><option value="identity" selected?={ e.Scope == "Brand identity" }>Brand identity</option><option value="complete" selected?={ e.Scope == "The complete picture" }>The complete picture</option></select><button class="button" type="submit">Calculate estimate ↗</button><span id="estimate-loading" class="htmx-indicator" role="status">Calculating…</span></form><p class="request-error" role="alert" hidden>We could not load the estimate. Please try again.</p></div><div id="estimate-result" aria-live="polite">@estimateCard(e)</div></section>
+				<section class="wrap faq-section"><h2>A few useful answers.</h2><details><summary>Who is this studio for?</summary><p>This fictional studio is designed around independent businesses, small teams, and people launching something considered.</p></details><details><summary>Can we start with just the website?</summary><p>Yes. The launch scope assumes you already have an identity and a clear idea of your content.</p></details><details><summary>Does this form send an enquiry?</summary><p>No. It calculates a sample estimate on the server. Nothing is saved, sent, or booked.</p></details></section>
+			</main>
+			<footer class="wrap marketing-footer"><a class="wordmark" href="#top">form&field</a><p>A fictional studio. A working HyperChi example.</p><a href="/docs/templ">Read the integration guide ↗</a></footer>
+		</body>
+	</html>
+}

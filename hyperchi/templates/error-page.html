@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Type}} - HyperChi Error</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .error-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .error-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .error-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .error-header .error-id {
+            opacity: 0.9;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+
+        .error-message h2 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .error-message p {
+            color: #856404;
+            font-family: 'Monaco', 'Consolas', monospace;
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            background: white;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stack-trace {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .stack-frame {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .stack-frame-header {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stack-frame-header:hover {
+            background: #e9ecef;
+        }
+
+        .stack-frame-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stack-frame-function {
+            font-weight: 600;
+            color: #dc3545;
+        }
+
+        .stack-frame-location {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .stack-frame-toggle {
+            color: #007bff;
+            font-size: 0.8rem;
+        }
+
+        .stack-frame-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .stack-frame-content.show {
+            display: block;
+        }
+
+        .source-code {
+            background: #282c34;
+            color: #abb2bf;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .source-line {
+            display: flex;
+            padding: 0;
+            border-left: 3px solid transparent;
+        }
+
+        .source-line.error-line {
+            background: #3c2415;
+            border-left-color: #ff6b6b;
+        }
+
+        .source-line:hover {
+            background: #2c313c;
+        }
+
+        .line-number {
+            width: 50px;
+            padding: 8px 12px;
+            text-align: right;
+            color: #5c6370;
+            background: #21252b;
+            user-select: none;
+            border-right: 1px solid #3e4451;
+        }
+
+        .line-content {
+            padding: 8px 12px;
+            flex: 1;
+            white-space: pre;
+        }
+
+        .error-line .line-number {
+            background: #ff6b6b;
+            color: white;
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-card h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-key {
+            font-weight: 600;
+            color: #6c757d;
+            flex: 0 0 120px;
+        }
+
+        .info-value {
+            color: #495057;
+            word-break: break-all;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .timestamp {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stack-frame-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-header">
+            <h1>{{.Type}}</h1>
+            <div class="error-id">Error ID: {{.ID}}</div>
+            <div class="timestamp">{{.Time.Format "2006-01-02 15:04:05 MST"}}</div>
+        </div>
+
+        <div class="error-message">
+            <h2>Error Message</h2>
+            <p>{{.Message}}</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('stack-trace')">Stack Trace</button>
+            {{if .SourceCode}}<button class="tab" onclick="showTab('source-code')">Source Code</button>{{end}}
+            <button class="tab" onclick="showTab('request-info')">Request</button>
+            <button class="tab" onclick="showTab('environment')">Environment</button>
+        </div>
+
+        <div id="stack-trace" class="tab-content active">
+            <div class="stack-trace">
+                {{range $index, $frame := .StackTrace}}
+                <div class="stack-frame">
+                    <div class="stack-frame-header" onclick="toggleFrame({{$index}})">
+                        <div class="stack-frame-info">
+                            <div class="stack-frame-function">{{$frame.Package}}.{{$frame.Function}}</div>
+                            <div class="stack-frame-location">{{$frame.File}}:{{$frame.Line}}</div>
+                        </div>
+                        <div class="stack-frame-toggle" id="toggle-{{$index}}">+ Show Code</div>
+                    </div>
+                    {{if $frame.Code}}
+                    <div class="stack-frame-content" id="frame-{{$index}}">
+                        <div class="source-code">
+                            <div class="source-line">
+                                <div class="line-number">{{$frame.Line}}</div>
+                                <div class="line-content">{{$frame.Code}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        {{if .SourceCode}}
+        <div id="source-code" class="tab-content">
+            <h3>{{.SourceCode.File}}:{{.SourceCode.Line}}</h3>
+            <div class="source-code">
+                {{range .SourceCode.LinesBefore}}
+                <div class="source-line">
+                    <div class="line-number">{{.Number}}</div>
+                    <div class="line-content">{{.Content}}</div>
+                </div>
+                {{end}}
+                <div class="source-line error-line">
+                    <div class="line-number">{{.SourceCode.ErrorLine.Number}}</div>
+                    <div class="line-content">{{.SourceCode.ErrorLine.Content}}</div>
+                </div>
+                {{range .SourceCode.LinesAfter}}
+                <div class="source-line">
+                    <div class="line-number">{{.Number}}</div>
+                    <div class="line-content">{{.Content}}</div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+
+        <div id="request-info" class="tab-content">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Request Details</h3>
+                    <div class="info-item">
+                        <div class="info-key">Method:</div>
+                        <div class="info-value">{{.Request.Method}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">URL:</div>
+                        <div class="info-value">{{.Request.URL}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">Remote Addr:</div>
+                        <div class="info-value">{{.Request.RemoteAddr}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">User Agent:</div>
+                        <div class="info-value">{{.Request.UserAgent}}</div>
+                    </div>
+                </div>
+
+                {{if .Request.Headers}}
+                <div class="info-card">
+                    <h3>Headers</h3>
+                    {{range $key, $value := .Request.Headers}}
+                    <div class="info-item">
+                        <div class="info-key">{{$key}}:</div>
+                        <div class="info-value">{{$value}}</div>
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+
+                {{if .Request.Query}}
+                <div class="info-card">
+                    <h3>Query Parameters</h3>
+                    {{range $key, $value := .Request.Query}}
+                    <div class="info-item">
+                        <div class="info-key">{{$key}}:</div>
+                        <div class="info-value">{{$value}}</div>
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        <div id="environment" class="tab-content">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>System Information</h3>
+                    <div class="info-item">
+                        <div class="info-key">Go Version:</div>
+                        <div class="info-value">{{index .Environment "go_version"}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">OS:</div>
+                        <div class="info-value">{{index .Environment "go_os"}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">Architecture:</div>
+                        <div class="info-value">{{index .Environment "go_arch"}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">Goroutines:</div>
+                        <div class="info-value">{{index .Environment "num_goroutines"}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">Memory Alloc:</div>
+                        <div class="info-value">{{index .Environment "memory_alloc"}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-key">Memory Sys:</div>
+                        <div class="info-value">{{index .Environment "memory_sys"}}</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Environment Variables</h3>
+                    {{range $key, $value := .Environment}}
+                        {{if and (ne $key "go_version") (ne $key "go_os") (ne $key "go_arch") (ne $key "num_goroutines") (ne $key "memory_alloc") (ne $key "memory_sys")}}
+                        <div class="info-item">
+                            <div class="info-key">{{$key}}:</div>
+                            <div class="info-value">{{$value}}</div>
+                        </div>
+                        {{end}}
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function toggleFrame(index) {
+            const content = document.getElementById('frame-' + index);
+            const toggle = document.getElementById('toggle-' + index);
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggle.textContent = '+ Show Code';
+            } else {
+                content.classList.add('show');
+                toggle.textContent = '- Hide Code';
+            }
+        }
+    </script>
+</body>
+</html>

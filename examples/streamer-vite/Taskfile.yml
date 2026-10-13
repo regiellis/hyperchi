@@ -1,0 +1,66 @@
+version: '3'
+
+vars:
+  BACKEND_PORT: 8080
+  FRONTEND_PORT: 3000
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  install:
+    desc: Install frontend dependencies (idempotent)
+    cmds:
+      - npm install
+    sources:
+      - package.json
+      - package-lock.json
+    generates:
+      - node_modules/.package-lock.json
+
+  deps:
+    desc: Install Go and frontend dependencies
+    cmds:
+      - go mod tidy
+      - task: install
+
+  backend:
+    desc: Start Go backend on :{{.BACKEND_PORT}} (no hot reload)
+    cmds:
+      - go run .
+
+  backend:air:
+    desc: Start Go backend with Air hot reload on :{{.BACKEND_PORT}}
+    cmds:
+      - air
+
+  frontend:
+    desc: Start Vite dev server on :{{.FRONTEND_PORT}}
+    deps: [install]
+    cmds:
+      - npm run dev
+
+  dev:
+    desc: Start backend + Vite together (Ctrl-C stops both)
+    deps:
+      - backend
+      - frontend
+
+  dev:air:
+    desc: Start backend (Air hot reload) + Vite together
+    deps:
+      - backend:air
+      - frontend
+
+  build:
+    desc: Build frontend for production
+    deps: [install]
+    cmds:
+      - npm run build
+
+  clean:
+    desc: Remove build artifacts and dependencies
+    cmds:
+      - rm -rf dist/ tmp/ node_modules/

@@ -1,0 +1,91 @@
+{{define "lobby"}}
+<main id="main" class="page lobby">
+  <section class="intro">
+    <p class="eyebrow">Realtime dice for two to four players</p>
+    <h1>Push your luck.<br>Bank before you bust.</h1>
+    <p class="lede">Open a table, share its code, and play Hot Dice in the browser. Every roll happens on the server and lands on every screen at the same moment.</p>
+  </section>
+  <div class="lobby-grid">
+    <section id="lobby-main" class="panel" aria-label="Your name and table">{{template "lobby-main" .}}</section>
+    <section class="panel" hx-ws:connect="/ws/lobby" aria-labelledby="open-title">
+      <div class="panel-head">
+        <h2 id="open-title">Open tables</h2>
+        <span class="live" title="Updates live"><span class="live-dot" aria-hidden="true"></span>Live</span>
+      </div>
+      <div id="open-rooms">{{template "room-list" .}}</div>
+    </section>
+  </div>
+  {{template "rules" .}}
+</main>
+{{end}}
+
+{{define "lobby-main"}}
+{{if not .me.Name}}
+  <h2>Pick a name</h2>
+  <p class="hint">Other players see it at the table.</p>
+  {{template "name-form" .}}
+{{else}}
+  <div class="identity" hc-data="nameEditor({{if .input.editing}}true{{else}}false{{end}})">
+    <p>You are <strong>{{.me.Name}}</strong>.
+      <button type="button" class="link" hc-on:click="editing = !editing" hc-bind:aria-expanded="editing" aria-expanded="false" aria-controls="name-edit">Change name</button>
+    </p>
+    <div id="name-edit" hc-show="editing" hc-cloak>{{template "name-form" .}}</div>
+  </div>
+
+  <form class="stack" hx-post="/rooms" hx-target="#lobby-main">
+    <h2>Open a table</h2>
+    <fieldset class="choices">
+      <legend>First to reach</legend>
+      {{range .targets}}
+      <label class="choice"><input type="radio" name="target" value="{{.Value}}"{{if eq .Value $.defaultTarget}} checked{{end}}><span>{{.Label}}</span></label>
+      {{end}}
+    </fieldset>
+    {{with .errors.target}}<p class="field-error">Target {{index . 0}}.</p>{{end}}
+    <button class="btn btn-primary">Open a table</button>
+  </form>
+
+  <form class="stack join" hx-post="/join" hx-target="#lobby-main">
+    <label class="label" for="code">Have a code?</label>
+    <div class="inline">
+      <input id="code" name="code" class="mono code-input" value="{{.input.code}}" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="5" placeholder="K7QFD" required{{if .errors.code}} aria-invalid="true" aria-describedby="code-error"{{end}}>
+      <button class="btn">Join</button>
+    </div>
+    {{with .errors.code}}<p id="code-error" class="field-error">That code {{index . 0}}.</p>{{end}}
+  </form>
+{{end}}
+{{end}}
+
+{{define "name-form"}}
+<form class="stack" hx-post="/name" hx-target="#lobby-main">
+  <label class="label" for="name">Display name</label>
+  <div class="inline">
+    <input id="name" name="name" value="{{.input.name}}" autocomplete="nickname" maxlength="20" required{{if .errors.name}} aria-invalid="true" aria-describedby="name-error"{{end}}>
+    <button class="btn btn-primary">Save</button>
+  </div>
+  {{with .errors.name}}<p id="name-error" class="field-error">Name {{index . 0}}.</p>{{end}}
+</form>
+{{end}}
+
+{{define "room-list"}}
+{{if .rooms}}
+<ul class="tables" role="list">
+  {{range .rooms}}
+  <li class="table-row">
+    <div class="table-info">
+      <span class="code mono">{{.Code}}</span>
+      <span class="meta">to {{.Target}} · {{.Seated}} of {{$.maxSeats}} seated · {{if eq .Status "playing"}}in play{{else if eq .Status "finished"}}between games{{else}}waiting{{end}}</span>
+      {{if .Names}}<span class="players">{{.Names}}</span>{{end}}
+    </div>
+    <div class="table-actions">
+      {{if .CanSit}}
+      <form hx-post="/join" hx-target="#lobby-main"><input type="hidden" name="code" value="{{.Code}}"><button class="btn btn-small">Join</button></form>
+      {{end}}
+      <a class="btn btn-small btn-quiet" href="/r/{{.Code}}">Watch</a>
+    </div>
+  </li>
+  {{end}}
+</ul>
+{{else}}
+<p class="empty">No open tables yet. Open one and send the code to a friend.</p>
+{{end}}
+{{end}}

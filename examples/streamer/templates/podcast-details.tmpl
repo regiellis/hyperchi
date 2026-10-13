@@ -1,0 +1,68 @@
+<!-- Podcast Details Fragment - Loaded via HTMX -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 py-4 md:py-8">
+    <div class="md:col-span-2">
+        <p class="text-base text-neutral-500 text-balance">{{.podcast.Description}}</p>
+        
+        <div class="mt-8">
+            <div class="flex gap-4">
+                <button hc-on:click="modalId = {{.podcast.ID}}"
+                        class="text-xs h-10 bg-base-medium dark:bg-neutral-900 dark:text-white flex items-center gap-4 text-black rounded-full px-6 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors">
+                    Read notes and Transcript <span>→</span>
+                </button>
+                <a href="#" class="text-xs h-10 bg-neutral-900 dark:bg-base-medium text-white dark:text-black flex items-center gap-4 rounded-full px-6 hover:bg-neutral-700 dark:hover:bg-neutral-300 transition-colors">
+                    Play Episode <span>▶</span>
+                </a>
+            </div>
+            
+            <div class="mt-12">
+                <p class="text-base text-black dark:text-white italic font-serif mb-4">Listen on</p>
+                <div class="prose prose-sm max-w-none">
+                    <ul class="list-none p-0 space-y-2">
+                        {{range .podcast.ListenOn}}
+                        <li class="m-0">
+                            <a href="{{.url}}" class="text-sm text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:underline no-underline">
+                                {{.name}}
+                            </a>
+                        </li>
+                        {{end}}
+                    </ul>
+                </div>
+            </div>
+            
+            {{if .podcast.Topics}}
+            <div class="mt-8">
+                <p class="text-base text-black dark:text-white italic font-serif mb-4">Topics covered</p>
+                <div class="prose prose-sm max-w-none">
+                    <ul class="list-disc pl-5 space-y-1">
+                        {{range .podcast.Topics}}
+                        <li class="text-sm text-neutral-600 dark:text-neutral-400">{{.}}</li>
+                        {{end}}
+                    </ul>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    
+    <div class="md:col-start-3">
+        <img src="{{asset .podcast.ImagePath}}" 
+             alt="{{.podcast.Title}}" 
+             class="w-full object-cover object-center rounded-lg shadow-sm"
+             loading="lazy">
+        
+        <div class="mt-4 text-xs text-neutral-500 space-y-1">
+            <div class="flex justify-between">
+                <span>Duration:</span>
+                <span>{{.podcast.Duration}}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Category:</span>
+                <span>{{.podcast.Category}}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Date:</span>
+                <span>{{.podcast.Date}}</span>
+            </div>
+        </div>
+    </div>
+</div>
