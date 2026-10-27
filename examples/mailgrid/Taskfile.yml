@@ -1,0 +1,57 @@
+version: '3'
+
+# Mailgrid example. One Go server with embedded assets; no Node build.
+# Per the repository rule, examples run with `go run .` or Air and are never
+# built in place with `go build .`.
+
+vars:
+  PORT: '{{.PORT | default "8080"}}'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  dev:
+    desc: Run on 0.0.0.0:{{.PORT}} (the next free port if taken), development mode with demo data
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - go run .
+
+  dev:air:
+    desc: Run with Air hot reload (rebuilds on .go, .js, .css, and .svg edits)
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - air
+
+  test:
+    desc: Race tests with coverage (databases live in t.TempDir)
+    cmds:
+      - go test -race -count=1 -cover ./...
+
+  lint:
+    desc: gofmt, go vet, and golangci-lint
+    cmds:
+      - test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - go vet ./...
+      - golangci-lint run ./...
+
+  check:
+    desc: Lint, then test
+    cmds:
+      - task: lint
+      - task: test
+
+  grade:
+    desc: Count net/http fallbacks with the agent-idiom grader
+    dir: ../..
+    cmds:
+      - go run ./evals/agentidioms/cmd/agent-eval -grade examples/mailgrid
+
+  clean:
+    desc: Remove Air output and the local database
+    cmds:
+      - rm -rf tmp/ data/ build-errors.log

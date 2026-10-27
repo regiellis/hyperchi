@@ -1,0 +1,30 @@
+# Air configuration for backend hot reload.
+# Run with: task backend:air  (or just: air)
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/app ."
+  bin = "./tmp/app"
+  full_bin = "PRODUCTION=false ./tmp/app"
+  include_ext = ["go", "tmpl", "html"]
+  include_dir = ["templates"]
+  exclude_dir = ["assets", "tmp", "vendor", "node_modules", "dist", "bin", "static", ".task", ".git"]
+  delay = 200
+  stop_on_root = false
+  send_interrupt = true
+  kill_delay = "500ms"
+  log = "tmp/build-errors.log"
+
+[log]
+  time = false
+  main_only = false
+
+[color]
+  build  = "yellow"
+  main   = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[misc]
+  clean_on_exit = true

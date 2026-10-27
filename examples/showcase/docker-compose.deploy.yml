@@ -1,0 +1,29 @@
+# Dokploy pulls an image built on the development host; Traefik owns public TLS.
+services:
+  web:
+    image: ${REGISTRY:-localhost:5000/hyperchi}/hyperchi-web:${TAG:?Set an existing release tag}
+    pull_policy: always
+    expose:
+      - "8080"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8080"
+      ENVIRONMENT: "production"
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Set the exact HTTPS origin}
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 256m
+    cpus: 0.75
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

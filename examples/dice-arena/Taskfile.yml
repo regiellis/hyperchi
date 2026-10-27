@@ -1,0 +1,60 @@
+version: '3'
+
+# Dice Arena: HyperChi's WebSocket example. Templates and static files are
+# embedded. Per the repo rule, examples run with `go run` or Air; nothing here
+# builds a binary.
+# Override the port with: task dev PORT=9000
+# Production needs SECRET_KEY (32+ bytes, e.g. `openssl rand -base64 32`) to sign
+# the player cookie; the app refuses to start without it. Development may leave
+# it unset and signs with a random per-process key.
+
+vars:
+  PORT: '{{.PORT | default "8080"}}'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  dev:
+    desc: Run with Air hot reload on 0.0.0.0:{{.PORT}} (rebuilds on .go, .tmpl, .css, .js edits)
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - air
+
+  run:
+    desc: Run without hot reload on 0.0.0.0:{{.PORT}}
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - go run .
+
+  test:
+    desc: Run every test with the race detector
+    cmds:
+      - go test -race -count=1 -cover ./...
+
+  lint:
+    desc: Check formatting, vet, and golangci-lint
+    cmds:
+      - test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - go vet ./...
+      - golangci-lint run ./...
+
+  check:
+    desc: Lint, then test
+    cmds:
+      - task: lint
+      - task: test
+
+  deps:
+    desc: Sync go.mod and go.sum
+    cmds:
+      - go mod tidy
+
+  clean:
+    desc: Remove Air's build output
+    cmds:
+      - rm -rf tmp/

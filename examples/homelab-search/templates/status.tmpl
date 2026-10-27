@@ -1,0 +1,17 @@
+{{define "index-status-body"}}{{with .index}}<div class="status-head">
+  <h2>Index</h2>
+  <span class="pulse{{if .Scanning}} busy{{end}}" aria-hidden="true"></span>
+  <span class="state{{if .Scanning}} busy{{end}}">{{if .Scanning}}scanning{{else}}up to date{{end}}</span>
+</div>
+<dl class="stats">
+  <div><dt>Files</dt><dd>{{.Files}}</dd></div>
+  <div><dt>Searchable</dt><dd>{{.Indexed}}</dd></div>
+  <div><dt>Listed only</dt><dd>{{.Skipped}}</dd></div>
+</dl>
+<p class="meta">{{if .LastScan.IsZero}}Not scanned yet.{{else}}Last {{.LastPass}} at <time datetime="{{.LastScan.Format "2006-01-02T15:04:05Z07:00"}}">{{.LastScan.Format "15:04:05"}}</time>{{if .Changed}}, {{.Changed}} {{pluralize "file" .Changed}} updated{{end}}.{{end}}</p>
+<p class="root" title="Library directory">{{.Root}}</p>
+{{- with .Errors}}
+<details class="errors"><summary>{{len .}} {{pluralize "problem" (len .)}} in the last pass</summary><ul>{{range .}}<li>{{.}}</li>{{end}}</ul></details>
+{{- end}}
+<button type="button" class="btn" hx-post="/rescan" hx-target="#index-status" hx-swap="innerHTML"{{if .Scanning}} disabled{{end}}>Rescan now</button>
+{{- end}}{{end}}

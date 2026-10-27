@@ -1,0 +1,39 @@
+{{define "results"}}<section class="results" aria-labelledby="results-heading" data-query="{{.q}}">
+  <h1 id="results-heading" class="sr-only">{{if .results.Searched}}Search results{{else}}Recently changed{{end}}</h1>
+  {{- $n := len .results.Hits}}
+  {{- if .results.Searched}}
+  <p class="count" role="status"><strong class="num">{{$n}}{{if .results.More}}+{{end}}</strong> {{pluralize "result" $n}} for “{{.q}}”{{with .type}} in {{.}}{{end}}{{with .tag}} tagged #{{.}}{{end}}</p>
+  {{- else if .q}}
+  <p class="count" role="status">“{{.q}}” has no letters or digits to search for. Showing recently changed files.</p>
+  {{- else}}
+  <p class="count" role="status">Recently changed{{with .type}} · {{.}}{{end}}{{with .tag}} · #{{.}}{{end}}</p>
+  {{- end}}
+  {{- if .results.Hits}}
+  <ol class="hits">
+    {{- range .results.Hits}}
+    <li><a class="hit" data-result href="/doc/{{.Path}}" hx-get="/doc/{{.Path}}" hx-target="#main" hx-push-url="true">
+      <span class="hit-title">{{.TitleHTML}}</span>
+      <span class="hit-path">{{.Path}}</span>
+      {{- if .Snippet}}
+      <span class="hit-snippet">{{.Snippet}}</span>
+      {{- else if .Reason}}
+      <span class="hit-note">Listed only: {{.Reason}}.</span>
+      {{- end}}
+      <span class="hit-meta"><span class="type">{{.Type}}</span>{{range .Tags}}<span class="tag">#{{.}}</span>{{end}}<span class="num">{{bytes .Size}}</span><time datetime="{{.Modified.Format "2006-01-02T15:04:05Z07:00"}}">{{.Modified.Format "2006-01-02 15:04"}}</time></span>
+    </a></li>
+    {{- end}}
+  </ol>
+  {{- if .results.More}}<p class="count">Showing the first {{$n}}. Add a word or a filter to narrow it down.</p>{{end}}
+  {{- else if .results.Searched}}
+  <div class="empty">
+    <h2>Nothing matches.</h2>
+    <p>Try fewer words, a prefix such as <code>backu*</code>, or a “quoted phrase”.</p>
+    {{- if or .type .tag}}<p>The {{if .type}}type{{end}}{{if and .type .tag}} and {{end}}{{if .tag}}tag{{end}} filter is on. <a href="/?q={{.q}}">Search everything</a>.</p>{{end}}
+  </div>
+  {{- else}}
+  <div class="empty">
+    <h2>{{if or .type .tag}}No files match these filters.{{else}}The library is empty.{{end}}</h2>
+    {{- with .index}}<p>Add files under <code>{{.Root}}</code> and they appear here within seconds.</p>{{end}}
+  </div>
+  {{- end}}
+</section>{{end}}

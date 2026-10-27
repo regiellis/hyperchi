@@ -1,0 +1,29 @@
+# Build output
+bin/
+dist/
+tmp/
+
+# Dependencies
+node_modules/
+
+# Task runner cache
+.task/
+
+# Environment files (don't commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+
+# Local databases (uncomment if you use them)
+# *.db
+# *.sqlite

@@ -1,0 +1,53 @@
+{{define "site-head"}}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ .title }}</title>
+<meta name="description" content="{{or .description "Build expressive web applications with Go, HTML, and HyperChi. Server-rendered pages, live updates, and room for a little creative freedom."}}">
+<meta property="og:title" content="HyperChi | Stay close to the web.">
+<meta property="og:description" content="Go on the server. HTML in the browser. Your ideas, in motion.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/static/img/og.png">
+<meta name="twitter:image" content="/static/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="{{asset "/static/img/favicon.svg"}}" type="image/svg+xml">
+<link rel="preload" href="/static/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{asset "/static/css/showcase.css"}}">
+<meta name="htmx-config" content='{"transitions":false,"defaultTimeout":0}'>
+<script src="{{asset "/static/js/theme.js"}}"></script>
+<noscript><style>.theme-control,.menu-toggle,.motion-control{display:none!important}.desktop-nav{display:flex;flex-wrap:wrap;gap:18px}.site-header{height:auto;min-height:88px;flex-wrap:wrap;padding-top:20px;padding-bottom:20px}.desktop-nav{order:3;width:100%}</style></noscript>
+{{end}}
+
+{{define "site-nav"}}
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="HyperChi home"><span class="brand-mark" aria-hidden="true"></span><span>hyper<b>chi</b></span></a>
+  <nav class="desktop-nav" aria-label="Primary">
+    <a href="/" {{if eq .current "home"}}aria-current="page"{{end}}>Overview</a>
+    <a href="/#playground">Playground</a>
+    <a href="/docs" {{if eq .current "docs"}}aria-current="page"{{end}}>Documentation</a>
+    <a href="/showcase" {{if eq .current "built"}}aria-current="page"{{end}}>Built with</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="theme-control" hc-on:click="toggleTheme()" aria-label="Toggle color theme"><span aria-hidden="true">◐</span></button>
+    <a class="source-link" href="https://github.com/regiellis/hyperchi">GitHub <span aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" hc-on:click="menu = !menu" hc-bind:aria-expanded="menu" aria-expanded="false" aria-controls="mobile-nav">Menu</button>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hc-show="menu" hc-cloak>
+    <a href="/">Overview</a><a href="/#playground" hc-on:click="menu = false">Playground</a><a href="/docs">Documentation</a><a href="/showcase">Built with</a>
+  </nav>
+</header>
+{{end}}
+
+{{define "site-footer"}}
+<footer class="site-footer">
+  <div class="footer-top"><a class="brand" href="/">hyper<b>chi</b></a><p>Go on the server. HTML in the browser.</p><a href="https://github.com/regiellis/hyperchi">Made in the open <span aria-hidden="true">↗</span></a></div>
+  <div class="footer-word" aria-hidden="true">hyperchi<span>_</span></div>
+  <div class="footer-bottom"><span>A framework for the web you want to build.</span><a href="https://github.com/regiellis/hyperchi/blob/main/LICENSE">Open source license</a><a href="#top">Back to top ↑</a></div>
+</footer>
+{{end}}
+
+{{define "site-scripts"}}
+<script src="{{asset "/static/js/htmx.min.js"}}"></script>
+<script src="{{asset "/static/js/hyperchi-directives.js"}}"></script>
+<script type="module" src="{{asset "/static/js/site.js"}}"></script>
+{{end}}

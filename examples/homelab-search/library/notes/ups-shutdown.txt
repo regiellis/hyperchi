@@ -1,0 +1,18 @@
+UPS shutdown order
+==================
+
+The UPS is an APC Smart-UPS 1500 on USB to the NAS. The NAS runs the NUT
+server; everything else is a NUT client in netclient mode.
+
+On battery, after 5 minutes or at 40% charge, whichever comes first:
+
+  1. atlas stops its containers (compose down) and powers off.
+  2. pve1 and pve2 shut down their guests, then power off.
+  3. The NAS powers off last, then tells the UPS to cut the load.
+
+Power returns: the NAS boots on AC restore (BIOS setting). Proxmox hosts
+boot by Wake-on-LAN from the NAS script /usr/local/bin/wake-servers.
+
+Test this twice a year: pull the UPS plug, watch the logs, time it.
+Last test: shutdown sequence took 3 min 40 s. Battery runtime at idle load
+is about 22 minutes.

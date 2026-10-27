@@ -1,0 +1,2942 @@
+[
+  {
+    "name": "Request (Context)",
+    "import": "github.com/regiellis/hyperchi/hyperchi",
+    "entries": [
+      {
+        "name": "Context",
+        "signature": "type Context struct",
+        "summary": "Context carries one request through a Handler: read the request with its accessors, then answer with one of its response methods."
+      },
+      {
+        "name": "Context.App",
+        "signature": "func (c *Context) App() *HyperChi",
+        "summary": "App returns the application serving this request."
+      },
+      {
+        "name": "Context.CSRFToken",
+        "signature": "func (c *Context) CSRFToken() string",
+        "summary": "CSRFToken returns the request's CSRF token for forms and htmx headers that post back, or \"\" outside Middleware.CSRF."
+      },
+      {
+        "name": "Context.Cookie",
+        "signature": "func (c *Context) Cookie(name string) string",
+        "summary": "Cookie returns a request cookie's value, or \"\" when it is not set."
+      },
+      {
+        "name": "Context.Ctx",
+        "signature": "func (c *Context) Ctx() context.Context",
+        "summary": "Ctx returns the request's context.Context, for cancellation and deadlines."
+      },
+      {
+        "name": "Context.FormBool",
+        "signature": "func (c *Context) FormBool(key string) bool",
+        "summary": "FormBool reports whether a checkbox was submitted checked."
+      },
+      {
+        "name": "Context.FormInt",
+        "signature": "func (c *Context) FormInt(key string, fallback int) int",
+        "summary": "FormInt returns a form field as an int, or fallback when it is absent or not an integer."
+      },
+      {
+        "name": "Context.FormValue",
+        "signature": "func (c *Context) FormValue(key string) string",
+        "summary": "FormValue returns a submitted form field, parsing the body on first use."
+      },
+      {
+        "name": "Context.FormValues",
+        "signature": "func (c *Context) FormValues(key string) []string",
+        "summary": "FormValues returns every value of a form field, such as a multi-select or repeated checkboxes."
+      },
+      {
+        "name": "Context.Header",
+        "signature": "func (c *Context) Header(key string) string",
+        "summary": "Header returns a request header."
+      },
+      {
+        "name": "Context.IsHTMX",
+        "signature": "func (c *Context) IsHTMX() bool",
+        "summary": "IsHTMX reports whether htmx sent the request."
+      },
+      {
+        "name": "Context.Method",
+        "signature": "func (c *Context) Method() string",
+        "summary": "Method returns the request method."
+      },
+      {
+        "name": "Context.Param",
+        "signature": "func (c *Context) Param(key string) string",
+        "summary": "Param returns a route parameter, such as {id} in \"/users/{id}\"."
+      },
+      {
+        "name": "Context.ParamInt",
+        "signature": "func (c *Context) ParamInt(key string) (int, error)",
+        "summary": "ParamInt returns a route parameter as an int."
+      },
+      {
+        "name": "Context.ParamInt64",
+        "signature": "func (c *Context) ParamInt64(key string) (int64, error)",
+        "summary": "ParamInt64 returns a route parameter as an int64, for database IDs."
+      },
+      {
+        "name": "Context.ParamUUID",
+        "signature": "func (c *Context) ParamUUID(key string) (string, error)",
+        "summary": "ParamUUID returns a route parameter that must be a UUID in 8-4-4-4-12 hex form, lowercased."
+      },
+      {
+        "name": "Context.Path",
+        "signature": "func (c *Context) Path() string",
+        "summary": "Path returns the request URL path."
+      },
+      {
+        "name": "Context.Queries",
+        "signature": "func (c *Context) Queries(key string) []string",
+        "summary": "Queries returns every value of a query parameter."
+      },
+      {
+        "name": "Context.Query",
+        "signature": "func (c *Context) Query(key string) string",
+        "summary": "Query returns the first value of a query string parameter."
+      },
+      {
+        "name": "Context.QueryBool",
+        "signature": "func (c *Context) QueryBool(key string, fallback bool) bool",
+        "summary": "QueryBool returns a query parameter as a bool, or fallback when it is absent or unrecognized."
+      },
+      {
+        "name": "Context.QueryDefault",
+        "signature": "func (c *Context) QueryDefault(key, fallback string) string",
+        "summary": "QueryDefault returns the first query value, or fallback when it is absent or empty."
+      },
+      {
+        "name": "Context.QueryFloat",
+        "signature": "func (c *Context) QueryFloat(key string, fallback float64) float64",
+        "summary": "QueryFloat returns a query parameter as a float64, or fallback when it is absent, not a number, or not finite (NaN and Inf are refused)."
+      },
+      {
+        "name": "Context.QueryInt",
+        "signature": "func (c *Context) QueryInt(key string, fallback int) int",
+        "summary": "QueryInt returns a query parameter as an int, or fallback when it is absent or not an integer."
+      },
+      {
+        "name": "Context.QueryInt64",
+        "signature": "func (c *Context) QueryInt64(key string, fallback int64) int64",
+        "summary": "QueryInt64 returns a query parameter as an int64, or fallback when it is absent or not an integer."
+      },
+      {
+        "name": "Context.Request",
+        "signature": "func (c *Context) Request() *http.Request",
+        "summary": "Request returns the underlying *http.Request."
+      },
+      {
+        "name": "Context.Response",
+        "signature": "func (c *Context) Response() http.ResponseWriter",
+        "summary": "Response returns the underlying http.ResponseWriter, for code that has to write the response itself (streaming, a third-party encoder)."
+      },
+      {
+        "name": "Context.Session",
+        "signature": "func (c *Context) Session() *KVSession",
+        "summary": "Session returns the request's session, or nil when the route does not run behind SessionMiddleware (see UseSessions)."
+      },
+      {
+        "name": "Context.UserID",
+        "signature": "func (c *Context) UserID() string",
+        "summary": "UserID returns the authenticated user's ID set by the auth middleware, or \"\" for an anonymous request."
+      },
+      {
+        "name": "Context.Value",
+        "signature": "func (c *Context) Value(key string) any",
+        "summary": "Value returns a value attached to the request with WithContext, typically by middleware."
+      },
+      {
+        "name": "Context.WantsJSON",
+        "signature": "func (c *Context) WantsJSON() bool",
+        "summary": "WantsJSON reports whether the client prefers JSON to HTML: an Accept header naming application/json and not text/html, or a route behind JSONErrors."
+      },
+      {
+        "name": "HyperChi.NewContext",
+        "signature": "func (g *HyperChi) NewContext(w http.ResponseWriter, r *http.Request) *Context",
+        "summary": "NewContext builds a Context outside a route, for tests and for adapters that receive a plain net/http request."
+      }
+    ]
+  },
+  {
+    "name": "Responses (Context)",
+    "import": "github.com/regiellis/hyperchi/hyperchi",
+    "entries": [
+      {
+        "name": "Context.Attachment",
+        "signature": "func (c *Context) Attachment(filename, contentType string, body []byte) error",
+        "summary": "Attachment sends body as a download named filename."
+      },
+      {
+        "name": "Context.Back",
+        "signature": "func (c *Context) Back(fallback string) error",
+        "summary": "Back redirects to the page the request came from, read from the Referer header, or to fallback when there is none or it names another host."
+      },
+      {
+        "name": "Context.Blob",
+        "signature": "func (c *Context) Blob(contentType string, body []byte) error",
+        "summary": "Blob writes body with the given content type, for responses Text and HTML do not cover (Markdown, CSV, images)."
+      },
+      {
+        "name": "Context.ETag",
+        "signature": "func (c *Context) ETag(tag string) *Context",
+        "summary": "ETag sets the response's entity tag."
+      },
+      {
+        "name": "Context.Empty",
+        "signature": "func (c *Context) Empty() error",
+        "summary": "Empty sends the status (200 unless set with Status) and headers with no body, for responses whose headers are the answer."
+      },
+      {
+        "name": "Context.Fragment",
+        "signature": "func (c *Context) Fragment(name string, data any) error",
+        "summary": "Fragment renders a template without a layout, for htmx swaps."
+      },
+      {
+        "name": "Context.Fresh",
+        "signature": "func (c *Context) Fresh() bool",
+        "summary": "Fresh reports whether the client's cached copy is current: a GET or HEAD whose If-None-Match names the response's ETag, compared weakly as RFC 9110 requires, or is \"*\"."
+      },
+      {
+        "name": "Context.HTML",
+        "signature": "func (c *Context) HTML(markup template.HTML) error",
+        "summary": "HTML writes trusted HTML."
+      },
+      {
+        "name": "Context.HX",
+        "signature": "func (c *Context) HX() *HX",
+        "summary": "HX returns the htmx helper for this request."
+      },
+      {
+        "name": "Context.JSON",
+        "signature": "func (c *Context) JSON(data any) error",
+        "summary": "JSON writes data as a JSON response."
+      },
+      {
+        "name": "Context.Layout",
+        "signature": "func (c *Context) Layout(name string) *Context",
+        "summary": "Layout picks the layout template (\"layout-\u003cname\u003e\") for Page and View."
+      },
+      {
+        "name": "Context.NoContent",
+        "signature": "func (c *Context) NoContent() error",
+        "summary": "NoContent sends 204 No Content."
+      },
+      {
+        "name": "Context.NotModified",
+        "signature": "func (c *Context) NotModified() error",
+        "summary": "NotModified sends 304 Not Modified with no body, keeping the ETag and other headers already set."
+      },
+      {
+        "name": "Context.Page",
+        "signature": "func (c *Context) Page(name string, data any) error",
+        "summary": "Page renders a template inside its layout, whatever sent the request."
+      },
+      {
+        "name": "Context.Redirect",
+        "signature": "func (c *Context) Redirect(url string) error",
+        "summary": "Redirect sends the client to url."
+      },
+      {
+        "name": "Context.RenderWith",
+        "signature": "func (c *Context) RenderWith(name string, data any) error",
+        "summary": "RenderWith renders through a named integration (see Integrations), such as a templ or Jet adapter, buffering before any header is sent."
+      },
+      {
+        "name": "Context.SetCookie",
+        "signature": "func (c *Context) SetCookie(cookie *http.Cookie) *Context",
+        "summary": "SetCookie adds a Set-Cookie header to the response."
+      },
+      {
+        "name": "Context.SetHeader",
+        "signature": "func (c *Context) SetHeader(key, value string) *Context",
+        "summary": "SetHeader sets a response header."
+      },
+      {
+        "name": "Context.Status",
+        "signature": "func (c *Context) Status(code int) *Context",
+        "summary": "Status sets the status code for the response this handler sends next."
+      },
+      {
+        "name": "Context.Text",
+        "signature": "func (c *Context) Text(s string) error",
+        "summary": "Text writes a plain-text response."
+      },
+      {
+        "name": "Context.View",
+        "signature": "func (c *Context) View(name string, data any) error",
+        "summary": "View renders a template the way the request needs it: the full page inside its layout for a normal or boosted navigation, and the template alone for an htmx partial request."
+      },
+      {
+        "name": "HX",
+        "signature": "type HX struct",
+        "summary": "HX reads htmx request headers and sets htmx response headers."
+      },
+      {
+        "name": "HX.Boosted",
+        "signature": "func (h *HX) Boosted() bool",
+        "summary": "Boosted reports a boosted link or form navigation (HX-Boosted)."
+      },
+      {
+        "name": "HX.CurrentURL",
+        "signature": "func (h *HX) CurrentURL() string",
+        "summary": "CurrentURL is the page the browser was on (HX-Current-URL)."
+      },
+      {
+        "name": "HX.Empty",
+        "signature": "func (h *HX) Empty() error",
+        "summary": "Empty finishes with an empty 200 response, for a request that only needs the htmx headers (a trigger, a refresh, a location change)."
+      },
+      {
+        "name": "HX.Fragment",
+        "signature": "func (h *HX) Fragment(name string, data any) error",
+        "summary": "Fragment finishes with Context.Fragment."
+      },
+      {
+        "name": "HX.HTML",
+        "signature": "func (h *HX) HTML(markup template.HTML) error",
+        "summary": "HTML finishes with Context.HTML."
+      },
+      {
+        "name": "HX.JSON",
+        "signature": "func (h *HX) JSON(data any) error",
+        "summary": "JSON finishes with Context.JSON."
+      },
+      {
+        "name": "HX.Location",
+        "signature": "func (h *HX) Location(url string) *HX",
+        "summary": "Location navigates without a full reload (HX-Location)."
+      },
+      {
+        "name": "HX.NoContent",
+        "signature": "func (h *HX) NoContent() error",
+        "summary": "NoContent finishes with Context.NoContent, which still sends the headers."
+      },
+      {
+        "name": "HX.Page",
+        "signature": "func (h *HX) Page(name string, data any) error",
+        "summary": "Page finishes with Context.Page."
+      },
+      {
+        "name": "HX.PushURL",
+        "signature": "func (h *HX) PushURL(url string) *HX",
+        "summary": "PushURL pushes url onto browser history (HX-Push-Url)."
+      },
+      {
+        "name": "HX.Refresh",
+        "signature": "func (h *HX) Refresh() *HX",
+        "summary": "Refresh makes the browser reload the page (HX-Refresh)."
+      },
+      {
+        "name": "HX.ReplaceURL",
+        "signature": "func (h *HX) ReplaceURL(url string) *HX",
+        "summary": "ReplaceURL replaces the current history entry (HX-Replace-Url)."
+      },
+      {
+        "name": "HX.Reselect",
+        "signature": "func (h *HX) Reselect(selector string) *HX",
+        "summary": "Reselect picks part of the response to swap (HX-Reselect)."
+      },
+      {
+        "name": "HX.Reswap",
+        "signature": "func (h *HX) Reswap(swap string) *HX",
+        "summary": "Reswap changes the swap strategy, such as \"outerHTML\" (HX-Reswap)."
+      },
+      {
+        "name": "HX.Retarget",
+        "signature": "func (h *HX) Retarget(selector string) *HX",
+        "summary": "Retarget swaps the response into a different element (HX-Retarget)."
+      },
+      {
+        "name": "HX.Source",
+        "signature": "func (h *HX) Source() string",
+        "summary": "Source is the element that issued the request, as \"tag#id\" (HX-Source)."
+      },
+      {
+        "name": "HX.Status",
+        "signature": "func (h *HX) Status(code int) *HX",
+        "summary": "Status sets the response status, as Context.Status does."
+      },
+      {
+        "name": "HX.Target",
+        "signature": "func (h *HX) Target() string",
+        "summary": "Target identifies the element htmx will swap into, as \"tagName#id\" such as \"div#results\" (HX-Target)."
+      },
+      {
+        "name": "HX.Trigger",
+        "signature": "func (h *HX) Trigger(event string, detail ...any) *HX",
+        "summary": "Trigger fires a client-side event after the swap."
+      },
+      {
+        "name": "HX.View",
+        "signature": "func (h *HX) View(name string, data any) error",
+        "summary": "View finishes with Context.View."
+      },
+      {
+        "name": "HyperChi.SetGlobal",
+        "signature": "func (g *HyperChi) SetGlobal(key string, value any)",
+        "summary": "SetGlobal makes a value available to every template rendered through a Context, such as a site name or the Vite dev-server URL."
+      }
+    ]
+  },
+  {
+    "name": "Input binding",
+    "import": "github.com/regiellis/hyperchi/hyperchi",
+    "entries": [
+      {
+        "name": "Bind",
+        "signature": "func Bind[T any](c *Context) (T, error)",
+        "summary": "Bind decodes the request into a new T and validates it."
+      },
+      {
+        "name": "Context.Bind",
+        "signature": "func (c *Context) Bind(dst any) error",
+        "summary": "Bind decodes and validates the request into dst, a pointer to a struct."
+      },
+      {
+        "name": "Context.ValidateSchema",
+        "signature": "func (c *Context) ValidateSchema(name string) (map[string]any, error)",
+        "summary": "ValidateSchema checks the submitted form or JSON body against a schema registered on app.Schemas, returning the cleaned data, or a 422 error with per-field messages."
+      }
+    ]
+  },
+  {
+    "name": "Errors and statuses",
+    "import": "github.com/regiellis/hyperchi/hyperchi",
+    "entries": [
+      {
+        "name": "BadRequest",
+        "signature": "func BadRequest(message string) *HTTPError",
+        "summary": "BadRequest answers 400."
+      },
+      {
+        "name": "Conflict",
+        "signature": "func Conflict(message string) *HTTPError",
+        "summary": "Conflict answers 409."
+      },
+      {
+        "name": "ErrorFunc",
+        "signature": "type ErrorFunc func(c *Context, err error)",
+        "summary": "ErrorFunc renders an error a Handler returned."
+      },
+      {
+        "name": "Errorf",
+        "signature": "func Errorf(code int, format string, args ...any) *HTTPError",
+        "summary": "Errorf returns an HTTPError with a formatted message."
+      },
+      {
+        "name": "FieldErrors",
+        "signature": "func FieldErrors(err error) map[string][]string",
+        "summary": "FieldErrors returns the per-field messages of a validation error from Bind or BindMessage, or nil for any other error."
+      },
+      {
+        "name": "Forbidden",
+        "signature": "func Forbidden(message string) *HTTPError",
+        "summary": "Forbidden answers 403."
+      },
+      {
+        "name": "HTTPError",
+        "signature": "type HTTPError struct",
+        "summary": "HTTPError is an error with an HTTP status."
+      },
+      {
+        "name": "HTTPError.Error",
+        "signature": "func (e *HTTPError) Error() string",
+        "summary": "Error reports the status code, message, and wrapped cause."
+      },
+      {
+        "name": "HTTPError.Unwrap",
+        "signature": "func (e *HTTPError) Unwrap() error",
+        "summary": "Unwrap returns the wrapped cause, for errors.Is and errors.As."
+      },
+      {
+        "name": "HTTPError.Wrap",
+        "signature": "func (e *HTTPError) Wrap(err error) *HTTPError",
+        "summary": "Wrap attaches the underlying cause for logging."
+      },
+      {
+        "name": "HyperChi.DefaultError",
+        "signature": "func (g *HyperChi) DefaultError(c *Context, err error)",
+        "summary": "DefaultError renders err for the client that asked:"
+      },
+      {
+        "name": "HyperChi.OnError",
+        "signature": "func (g *HyperChi) OnError(fn ErrorFunc)",
+        "summary": "OnError replaces the default error handler."
+      },
+      {
+        "name": "HyperChi.RespondStatus",
+        "signature": "func (g *HyperChi) RespondStatus(w http.ResponseWriter, r *http.Request, code int, err error)",
+        "summary": "RespondStatus answers a refusal from net/http middleware (a rate limiter, an auth check, an optional module) through the app's error pipeline, so it renders like every framework denial: OnError or DefaultError, with no-store headers."
+      },
+      {
+        "name": "JSONErrors",
+        "signature": "func JSONErrors(next http.Handler) http.Handler",
+        "summary": "JSONErrors makes the routes it wraps answer every error as JSON, whatever the request's Accept header says, for API routes whose clients never ask for HTML."
+      },
+      {
+        "name": "NewHTTPError",
+        "signature": "func NewHTTPError(code int, message string) *HTTPError",
+        "summary": "NewHTTPError returns an error that answers with code and message."
+      },
+      {
+        "name": "NotFound",
+        "signature": "func NotFound(message string) *HTTPError",
+        "summary": "NotFound answers 404."
+      },
+      {
+        "name": "Unauthorized",
+        "signature": "func Unauthorized(message string) *HTTPError",
+        "summary": "Unauthorized answers 401."
+      },
+      {
+        "name": "Unprocessable",
+        "signature": "func Unprocessable(message string, fields map[string][]string) *HTTPError",
+        "summary": "Unprocessable answers 422 with per-field messages, the shape Bind returns when validation fails."
+      }
+    ]
+  },
+  {
+    "name": "Strings",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "CamelCase",
+        "signature": "func CamelCase(s string) string",
+        "summary": "CamelCase converts s to camelCase: \"hello world\" and \"hello_world\" become \"helloWorld\"."
+      },
+      {
+        "name": "Dedent",
+        "signature": "func Dedent(s string) string",
+        "summary": "Dedent removes the leading whitespace that every non-blank line shares."
+      },
+      {
+        "name": "Indent",
+        "signature": "func Indent(s string, indent string) string",
+        "summary": "Indent prefixes each non-blank line of s with indent."
+      },
+      {
+        "name": "Join",
+        "signature": "func Join(sep string, parts ...string) string",
+        "summary": "Join joins parts with sep."
+      },
+      {
+        "name": "JoinLines",
+        "signature": "func JoinLines(lines ...string) string",
+        "summary": "JoinLines joins lines with \"\\n\"."
+      },
+      {
+        "name": "JoinSpaces",
+        "signature": "func JoinSpaces(parts ...string) string",
+        "summary": "JoinSpaces joins parts with single spaces."
+      },
+      {
+        "name": "KebabCase",
+        "signature": "func KebabCase(s string) string",
+        "summary": "KebabCase converts s to kebab-case, splitting words as CamelCase does."
+      },
+      {
+        "name": "PascalCase",
+        "signature": "func PascalCase(s string) string",
+        "summary": "PascalCase converts s to PascalCase, splitting words as CamelCase does."
+      },
+      {
+        "name": "RandomString",
+        "signature": "func RandomString(length int) string",
+        "summary": "RandomString returns length random characters from a-z, A-Z, and 0-9."
+      },
+      {
+        "name": "S",
+        "signature": "func S(s string) Str",
+        "summary": "S converts s to a Str."
+      },
+      {
+        "name": "Slugify",
+        "signature": "func Slugify(s string) string",
+        "summary": "Slugify creates a URL-friendly slug of lowercase ASCII letters, digits, and hyphens: \"Crème Brûlée à la carte\" becomes \"creme-brulee-a-la-carte\"."
+      },
+      {
+        "name": "SnakeCase",
+        "signature": "func SnakeCase(s string) string",
+        "summary": "SnakeCase converts s to snake_case, splitting words as CamelCase does: \"userID\" becomes \"user_id\" and \"HTTPServer\" becomes \"http_server\"."
+      },
+      {
+        "name": "Str",
+        "signature": "type Str string",
+        "summary": "Str is a string with chainable methods: S(\" Hi \").Trim().Lower()."
+      },
+      {
+        "name": "Str.Capitalize",
+        "signature": "func (s Str) Capitalize() Str",
+        "summary": "Capitalize uppercases the first rune and leaves the rest unchanged."
+      },
+      {
+        "name": "Str.Center",
+        "signature": "func (s Str) Center(width int, fill ...string) Str",
+        "summary": "Center centers the string in a field width runes wide."
+      },
+      {
+        "name": "Str.CollapseWhitespace",
+        "signature": "func (s Str) CollapseWhitespace() Str",
+        "summary": "CollapseWhitespace trims s and replaces each run of whitespace with one space."
+      },
+      {
+        "name": "Str.Contains",
+        "signature": "func (s Str) Contains(substr string) bool",
+        "summary": "Contains reports whether substr is in s."
+      },
+      {
+        "name": "Str.ContainsAny",
+        "signature": "func (s Str) ContainsAny(chars string) bool",
+        "summary": "ContainsAny reports whether any rune in chars is in s."
+      },
+      {
+        "name": "Str.Count",
+        "signature": "func (s Str) Count(substr string) int",
+        "summary": "Count returns the number of non-overlapping occurrences of substr."
+      },
+      {
+        "name": "Str.EndsWith",
+        "signature": "func (s Str) EndsWith(suffix string) bool",
+        "summary": "EndsWith reports whether s ends with suffix."
+      },
+      {
+        "name": "Str.FindAll",
+        "signature": "func (s Str) FindAll(pattern string) ([]string, error)",
+        "summary": "FindAll returns every match of pattern, or the compile error for an invalid pattern."
+      },
+      {
+        "name": "Str.Index",
+        "signature": "func (s Str) Index(substr string) int",
+        "summary": "Index returns the rune offset of the first occurrence of substr, or -1."
+      },
+      {
+        "name": "Str.IsAlpha",
+        "signature": "func (s Str) IsAlpha() bool",
+        "summary": "IsAlpha reports whether s is non-empty and every rune is a letter."
+      },
+      {
+        "name": "Str.IsAlphaNumeric",
+        "signature": "func (s Str) IsAlphaNumeric() bool",
+        "summary": "IsAlphaNumeric reports whether s is non-empty and every rune is a letter or digit."
+      },
+      {
+        "name": "Str.IsBlank",
+        "signature": "func (s Str) IsBlank() bool",
+        "summary": "IsBlank reports whether s is empty or only whitespace."
+      },
+      {
+        "name": "Str.IsDigits",
+        "signature": "func (s Str) IsDigits() bool",
+        "summary": "IsDigits reports whether s is non-empty and every rune is a Unicode digit."
+      },
+      {
+        "name": "Str.IsEmpty",
+        "signature": "func (s Str) IsEmpty() bool",
+        "summary": "IsEmpty reports whether s is \"\"."
+      },
+      {
+        "name": "Str.IsNotBlank",
+        "signature": "func (s Str) IsNotBlank() bool",
+        "summary": "IsNotBlank reports whether s has a non-whitespace character."
+      },
+      {
+        "name": "Str.IsNotEmpty",
+        "signature": "func (s Str) IsNotEmpty() bool",
+        "summary": "IsNotEmpty reports whether s is not \"\"."
+      },
+      {
+        "name": "Str.Join",
+        "signature": "func (s Str) Join(parts []string) Str",
+        "summary": "Join joins parts with s as the separator."
+      },
+      {
+        "name": "Str.LastIndex",
+        "signature": "func (s Str) LastIndex(substr string) int",
+        "summary": "LastIndex returns the rune offset of the last occurrence of substr, or -1."
+      },
+      {
+        "name": "Str.Left",
+        "signature": "func (s Str) Left(n int) Str",
+        "summary": "Left returns the leftmost n runes."
+      },
+      {
+        "name": "Str.Len",
+        "signature": "func (s Str) Len() int",
+        "summary": "Len returns the number of runes in the string."
+      },
+      {
+        "name": "Str.Lower",
+        "signature": "func (s Str) Lower() Str",
+        "summary": "Lower returns s in lowercase."
+      },
+      {
+        "name": "Str.Matches",
+        "signature": "func (s Str) Matches(pattern string) (bool, error)",
+        "summary": "Matches reports whether the string contains a match of the regular expression pattern."
+      },
+      {
+        "name": "Str.PadLeft",
+        "signature": "func (s Str) PadLeft(width int, fill ...string) Str",
+        "summary": "PadLeft pads the string on the left to width runes, filling with the first rune of fill (a space by default)."
+      },
+      {
+        "name": "Str.PadRight",
+        "signature": "func (s Str) PadRight(width int, fill ...string) Str",
+        "summary": "PadRight pads the string on the right to width runes, filling with the first rune of fill (a space by default)."
+      },
+      {
+        "name": "Str.RegexReplace",
+        "signature": "func (s Str) RegexReplace(pattern, replacement string) (Str, error)",
+        "summary": "RegexReplace replaces every match of pattern, or returns the compile error for an invalid pattern."
+      },
+      {
+        "name": "Str.RemoveWhitespace",
+        "signature": "func (s Str) RemoveWhitespace() Str",
+        "summary": "RemoveWhitespace removes every whitespace rune."
+      },
+      {
+        "name": "Str.Repeat",
+        "signature": "func (s Str) Repeat(n int) Str",
+        "summary": "Repeat repeats the string n times."
+      },
+      {
+        "name": "Str.Replace",
+        "signature": "func (s Str) Replace(old, new string) Str",
+        "summary": "Replace replaces every occurrence of old with new."
+      },
+      {
+        "name": "Str.ReplaceN",
+        "signature": "func (s Str) ReplaceN(old, new string, n int) Str",
+        "summary": "ReplaceN replaces the first n occurrences of old with new."
+      },
+      {
+        "name": "Str.Reverse",
+        "signature": "func (s Str) Reverse() Str",
+        "summary": "Reverse reverses s rune by rune."
+      },
+      {
+        "name": "Str.Right",
+        "signature": "func (s Str) Right(n int) Str",
+        "summary": "Right returns the rightmost n runes."
+      },
+      {
+        "name": "Str.Slice",
+        "signature": "func (s Str) Slice(start, end int) Str",
+        "summary": "Slice returns the runes from start up to end."
+      },
+      {
+        "name": "Str.Split",
+        "signature": "func (s Str) Split(sep string) []string",
+        "summary": "Split splits s around each sep (see strings.Split)."
+      },
+      {
+        "name": "Str.SplitLines",
+        "signature": "func (s Str) SplitLines() []string",
+        "summary": "SplitLines splits s at each \"\\n\"."
+      },
+      {
+        "name": "Str.SplitN",
+        "signature": "func (s Str) SplitN(sep string, n int) []string",
+        "summary": "SplitN splits s around sep into at most n parts (see strings.SplitN)."
+      },
+      {
+        "name": "Str.SplitWhitespace",
+        "signature": "func (s Str) SplitWhitespace() []string",
+        "summary": "SplitWhitespace splits s around runs of whitespace (see strings.Fields)."
+      },
+      {
+        "name": "Str.StartsWith",
+        "signature": "func (s Str) StartsWith(prefix string) bool",
+        "summary": "StartsWith reports whether s begins with prefix."
+      },
+      {
+        "name": "Str.String",
+        "signature": "func (s Str) String() string",
+        "summary": "String returns s as a plain string."
+      },
+      {
+        "name": "Str.Title",
+        "signature": "func (s Str) Title() Str",
+        "summary": "Title uppercases the first letter of each word."
+      },
+      {
+        "name": "Str.ToBool",
+        "signature": "func (s Str) ToBool() bool",
+        "summary": "ToBool reports whether the trimmed s is \"true\", \"1\", \"yes\", or \"on\", ignoring case."
+      },
+      {
+        "name": "Str.ToFloat",
+        "signature": "func (s Str) ToFloat() (float64, error)",
+        "summary": "ToFloat parses the string as a float64."
+      },
+      {
+        "name": "Str.ToFloatOr",
+        "signature": "func (s Str) ToFloatOr(defaultValue float64) float64",
+        "summary": "ToFloatOr parses the string as a float64, returning defaultValue when it does not parse."
+      },
+      {
+        "name": "Str.ToInt",
+        "signature": "func (s Str) ToInt() (int, error)",
+        "summary": "ToInt parses the string as a base-10 int."
+      },
+      {
+        "name": "Str.ToIntOr",
+        "signature": "func (s Str) ToIntOr(defaultValue int) int",
+        "summary": "ToIntOr parses the string as a base-10 int, returning defaultValue when it does not parse."
+      },
+      {
+        "name": "Str.Trim",
+        "signature": "func (s Str) Trim() Str",
+        "summary": "Trim removes leading and trailing whitespace."
+      },
+      {
+        "name": "Str.TrimLeft",
+        "signature": "func (s Str) TrimLeft() Str",
+        "summary": "TrimLeft removes leading whitespace."
+      },
+      {
+        "name": "Str.TrimPrefix",
+        "signature": "func (s Str) TrimPrefix(prefix string) Str",
+        "summary": "TrimPrefix removes prefix from the start of s if it is there."
+      },
+      {
+        "name": "Str.TrimRight",
+        "signature": "func (s Str) TrimRight() Str",
+        "summary": "TrimRight removes trailing whitespace."
+      },
+      {
+        "name": "Str.TrimSuffix",
+        "signature": "func (s Str) TrimSuffix(suffix string) Str",
+        "summary": "TrimSuffix removes suffix from the end of s if it is there."
+      },
+      {
+        "name": "Str.Upper",
+        "signature": "func (s Str) Upper() Str",
+        "summary": "Upper returns s in uppercase."
+      },
+      {
+        "name": "Template",
+        "signature": "func Template(template string, vars map[string]string) string",
+        "summary": "Template replaces each {{key}} in template with vars[key]."
+      },
+      {
+        "name": "Truncate",
+        "signature": "func Truncate(s string, maxLen int, suffix ...string) string",
+        "summary": "Truncate shortens s to at most maxLen runes, ending in suffix (\"...\" by default) when it cuts."
+      },
+      {
+        "name": "WordCount",
+        "signature": "func WordCount(s string) int",
+        "summary": "WordCount returns the number of whitespace-separated words in s."
+      },
+      {
+        "name": "Words",
+        "signature": "func Words(s string) []string",
+        "summary": "Words splits s around runs of whitespace."
+      }
+    ]
+  },
+  {
+    "name": "Collections",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "FlatMap",
+        "signature": "func FlatMap[T, U any](slice Slice[T], fn func(T) Slice[U]) Slice[U]",
+        "summary": "FlatMap calls fn on each element and concatenates the results."
+      },
+      {
+        "name": "Flatten",
+        "signature": "func Flatten[T any](slices []Slice[T]) Slice[T]",
+        "summary": "Flatten concatenates slices into one new slice."
+      },
+      {
+        "name": "FromSlice",
+        "signature": "func FromSlice[T any](slice []T) Slice[T]",
+        "summary": "FromSlice converts slice to a Slice."
+      },
+      {
+        "name": "GroupBy",
+        "signature": "func GroupBy[T any, K comparable](slice Slice[T], keyFn func(T) K) map[K]Slice[T]",
+        "summary": "GroupBy returns the elements grouped by keyFn, each group in its original order."
+      },
+      {
+        "name": "Keys",
+        "signature": "func Keys[K comparable, V any](m map[K]V) Slice[K]",
+        "summary": "Keys returns the keys of m in no particular order."
+      },
+      {
+        "name": "Map",
+        "signature": "func Map[T, U any](slice Slice[T], fn func(T) U) Slice[U]",
+        "summary": "Map returns a new slice holding fn applied to each element."
+      },
+      {
+        "name": "MapWithIndex",
+        "signature": "func MapWithIndex[T, U any](slice Slice[T], fn func(int, T) U) Slice[U]",
+        "summary": "MapWithIndex is Map with each element's index passed to fn."
+      },
+      {
+        "name": "MaxBy",
+        "signature": "func MaxBy[T any](slice Slice[T], less func(T, T) bool) (T, bool)",
+        "summary": "MaxBy returns the largest element by less and true, or the zero value and false when slice is empty."
+      },
+      {
+        "name": "MinBy",
+        "signature": "func MinBy[T any](slice Slice[T], less func(T, T) bool) (T, bool)",
+        "summary": "MinBy returns the smallest element by less and true, or the zero value and false when slice is empty."
+      },
+      {
+        "name": "NewSlice",
+        "signature": "func NewSlice[T any](items ...T) Slice[T]",
+        "summary": "NewSlice returns a Slice of items."
+      },
+      {
+        "name": "Pair",
+        "signature": "type Pair struct",
+        "summary": "Pair is one element of a Zip result."
+      },
+      {
+        "name": "Range",
+        "signature": "func Range(start, end int) Slice[int]",
+        "summary": "Range returns the integers from start up to but not including end."
+      },
+      {
+        "name": "RangeStep",
+        "signature": "func RangeStep(start, end, step int) Slice[int]",
+        "summary": "RangeStep returns start, start+step, and so on, stopping before end."
+      },
+      {
+        "name": "Reduce",
+        "signature": "func Reduce[T, U any](slice Slice[T], fn func(U, T) U, initial U) U",
+        "summary": "Reduce folds the slice into one value, starting from initial and calling fn(accumulator, element) for each element in order."
+      },
+      {
+        "name": "ReduceWithIndex",
+        "signature": "func ReduceWithIndex[T, U any](slice Slice[T], fn func(U, int, T) U, initial U) U",
+        "summary": "ReduceWithIndex is Reduce with each element's index passed to fn."
+      },
+      {
+        "name": "Repeat",
+        "signature": "func Repeat[T any](value T, n int) Slice[T]",
+        "summary": "Repeat creates a slice with value repeated n times."
+      },
+      {
+        "name": "Slice",
+        "signature": "type Slice []T",
+        "summary": "Slice is a slice with chainable query and transform methods."
+      },
+      {
+        "name": "Slice.Append",
+        "signature": "func (s Slice[T]) Append(items ...T) Slice[T]",
+        "summary": "Append returns s with items added, using the built-in append: when s has spare capacity the result shares its backing array."
+      },
+      {
+        "name": "Slice.Chunk",
+        "signature": "func (s Slice[T]) Chunk(size int) []Slice[T]",
+        "summary": "Chunk splits s into consecutive pieces of size elements; the last piece may be shorter."
+      },
+      {
+        "name": "Slice.Contains",
+        "signature": "func (s Slice[T]) Contains(value T) bool",
+        "summary": "Contains reports whether an element equals value."
+      },
+      {
+        "name": "Slice.ContainsAll",
+        "signature": "func (s Slice[T]) ContainsAll(values ...T) bool",
+        "summary": "ContainsAll reports whether s contains every one of values."
+      },
+      {
+        "name": "Slice.ContainsAny",
+        "signature": "func (s Slice[T]) ContainsAny(values ...T) bool",
+        "summary": "ContainsAny reports whether s contains at least one of values."
+      },
+      {
+        "name": "Slice.Count",
+        "signature": "func (s Slice[T]) Count(value T) int",
+        "summary": "Count returns the number of elements equal to value."
+      },
+      {
+        "name": "Slice.CountIf",
+        "signature": "func (s Slice[T]) CountIf(predicate func(T) bool) int",
+        "summary": "CountIf returns the number of elements for which predicate is true."
+      },
+      {
+        "name": "Slice.Difference",
+        "signature": "func (s Slice[T]) Difference(other Slice[T]) Slice[T]",
+        "summary": "Difference returns the elements of s that are not in other, in s's order."
+      },
+      {
+        "name": "Slice.Every",
+        "signature": "func (s Slice[T]) Every(predicate func(T) bool) bool",
+        "summary": "Every reports whether predicate is true for every element."
+      },
+      {
+        "name": "Slice.Filter",
+        "signature": "func (s Slice[T]) Filter(predicate func(T) bool) Slice[T]",
+        "summary": "Filter returns a new slice of the elements for which predicate is true."
+      },
+      {
+        "name": "Slice.FilterWithIndex",
+        "signature": "func (s Slice[T]) FilterWithIndex(predicate func(int, T) bool) Slice[T]",
+        "summary": "FilterWithIndex is Filter with each element's index passed to predicate."
+      },
+      {
+        "name": "Slice.Find",
+        "signature": "func (s Slice[T]) Find(predicate func(T) bool) (T, bool)",
+        "summary": "Find returns the first element for which predicate is true and true, or the zero value and false."
+      },
+      {
+        "name": "Slice.FindIndex",
+        "signature": "func (s Slice[T]) FindIndex(predicate func(T) bool) int",
+        "summary": "FindIndex returns the index of the first element for which predicate is true, or -1."
+      },
+      {
+        "name": "Slice.First",
+        "signature": "func (s Slice[T]) First() (T, bool)",
+        "summary": "First returns the first element and true, or the zero value and false when s is empty."
+      },
+      {
+        "name": "Slice.ForEach",
+        "signature": "func (s Slice[T]) ForEach(fn func(T))",
+        "summary": "ForEach calls fn with each element in order."
+      },
+      {
+        "name": "Slice.ForEachWithIndex",
+        "signature": "func (s Slice[T]) ForEachWithIndex(fn func(int, T))",
+        "summary": "ForEachWithIndex calls fn with each index and element in order."
+      },
+      {
+        "name": "Slice.Get",
+        "signature": "func (s Slice[T]) Get(index int) (T, bool)",
+        "summary": "Get returns the element at index and true, or the zero value and false when index is out of range."
+      },
+      {
+        "name": "Slice.GetOr",
+        "signature": "func (s Slice[T]) GetOr(index int, defaultValue T) T",
+        "summary": "GetOr returns the element at index, or defaultValue when index is out of range."
+      },
+      {
+        "name": "Slice.Index",
+        "signature": "func (s Slice[T]) Index(value T) int",
+        "summary": "Index returns the index of the first element equal to value, or -1."
+      },
+      {
+        "name": "Slice.Insert",
+        "signature": "func (s Slice[T]) Insert(index int, items ...T) Slice[T]",
+        "summary": "Insert returns a new slice with items placed before index."
+      },
+      {
+        "name": "Slice.Intersect",
+        "signature": "func (s Slice[T]) Intersect(other Slice[T]) Slice[T]",
+        "summary": "Intersect returns the elements of s that are also in other, without duplicates, in s's order."
+      },
+      {
+        "name": "Slice.IsEmpty",
+        "signature": "func (s Slice[T]) IsEmpty() bool",
+        "summary": "IsEmpty reports whether s has no elements."
+      },
+      {
+        "name": "Slice.IsNotEmpty",
+        "signature": "func (s Slice[T]) IsNotEmpty() bool",
+        "summary": "IsNotEmpty reports whether s has at least one element."
+      },
+      {
+        "name": "Slice.Last",
+        "signature": "func (s Slice[T]) Last() (T, bool)",
+        "summary": "Last returns the last element and true, or the zero value and false when s is empty."
+      },
+      {
+        "name": "Slice.LastIndex",
+        "signature": "func (s Slice[T]) LastIndex(value T) int",
+        "summary": "LastIndex returns the index of the last element equal to value, or -1."
+      },
+      {
+        "name": "Slice.Len",
+        "signature": "func (s Slice[T]) Len() int",
+        "summary": "Len returns the number of elements."
+      },
+      {
+        "name": "Slice.None",
+        "signature": "func (s Slice[T]) None(predicate func(T) bool) bool",
+        "summary": "None reports whether predicate is false for every element."
+      },
+      {
+        "name": "Slice.OrEmpty",
+        "signature": "func (s Slice[T]) OrEmpty() Slice[T]",
+        "summary": "OrEmpty returns a non-nil slice so JSON encodes an empty collection as []."
+      },
+      {
+        "name": "Slice.Partition",
+        "signature": "func (s Slice[T]) Partition(predicate func(T) bool) (Slice[T], Slice[T])",
+        "summary": "Partition returns the elements for which predicate is true, then the rest, each in original order."
+      },
+      {
+        "name": "Slice.Prepend",
+        "signature": "func (s Slice[T]) Prepend(items ...T) Slice[T]",
+        "summary": "Prepend returns a new slice with items followed by the elements of s."
+      },
+      {
+        "name": "Slice.Remove",
+        "signature": "func (s Slice[T]) Remove(index int) Slice[T]",
+        "summary": "Remove returns a new slice without the element at index."
+      },
+      {
+        "name": "Slice.RemoveAll",
+        "signature": "func (s Slice[T]) RemoveAll(value T) Slice[T]",
+        "summary": "RemoveAll returns a new slice without any element equal to value."
+      },
+      {
+        "name": "Slice.RemoveValue",
+        "signature": "func (s Slice[T]) RemoveValue(value T) Slice[T]",
+        "summary": "RemoveValue returns a new slice without the first element equal to value, or s itself when there is none."
+      },
+      {
+        "name": "Slice.Reverse",
+        "signature": "func (s Slice[T]) Reverse() Slice[T]",
+        "summary": "Reverse returns a reversed copy of s."
+      },
+      {
+        "name": "Slice.Skip",
+        "signature": "func (s Slice[T]) Skip(n int) Slice[T]",
+        "summary": "Skip returns s without its first n elements."
+      },
+      {
+        "name": "Slice.SkipLast",
+        "signature": "func (s Slice[T]) SkipLast(n int) Slice[T]",
+        "summary": "SkipLast returns s without its last n elements."
+      },
+      {
+        "name": "Slice.Slice",
+        "signature": "func (s Slice[T]) Slice(start, end int) Slice[T]",
+        "summary": "Slice returns the elements from start up to end."
+      },
+      {
+        "name": "Slice.Some",
+        "signature": "func (s Slice[T]) Some(predicate func(T) bool) bool",
+        "summary": "Some reports whether predicate is true for at least one element."
+      },
+      {
+        "name": "Slice.Sort",
+        "signature": "func (s Slice[T]) Sort(less func(T, T) bool) Slice[T]",
+        "summary": "Sort returns a sorted copy of s, ordered by less."
+      },
+      {
+        "name": "Slice.Take",
+        "signature": "func (s Slice[T]) Take(n int) Slice[T]",
+        "summary": "Take returns the first n elements, or all of s when it is shorter."
+      },
+      {
+        "name": "Slice.TakeLast",
+        "signature": "func (s Slice[T]) TakeLast(n int) Slice[T]",
+        "summary": "TakeLast returns the last n elements, or all of s when it is shorter."
+      },
+      {
+        "name": "Slice.ToSlice",
+        "signature": "func (s Slice[T]) ToSlice() []T",
+        "summary": "ToSlice returns s as a plain slice, sharing its backing array."
+      },
+      {
+        "name": "Slice.Union",
+        "signature": "func (s Slice[T]) Union(other Slice[T]) Slice[T]",
+        "summary": "Union returns the elements of s followed by those of other, without duplicates (see Unique)."
+      },
+      {
+        "name": "Slice.Unique",
+        "signature": "func (s Slice[T]) Unique() Slice[T]",
+        "summary": "Unique returns the first occurrence of each element, preserving order."
+      },
+      {
+        "name": "Times",
+        "signature": "func Times[T any](n int, fn func(int) T) Slice[T]",
+        "summary": "Times calls fn with 0..n-1 and collects the results."
+      },
+      {
+        "name": "ToMap",
+        "signature": "func ToMap[T any, K comparable](slice Slice[T], keyFn func(T) K) map[K]T",
+        "summary": "ToMap returns a map from keyFn(element) to element."
+      },
+      {
+        "name": "ToMapValue",
+        "signature": "func ToMapValue[T any, K comparable, V any](slice Slice[T], keyFn func(T) K, valueFn func(T) V) map[K]V",
+        "summary": "ToMapValue returns a map from keyFn(element) to valueFn(element)."
+      },
+      {
+        "name": "Values",
+        "signature": "func Values[K comparable, V any](m map[K]V) Slice[V]",
+        "summary": "Values returns the values of m in no particular order."
+      },
+      {
+        "name": "Zip",
+        "signature": "func Zip[T, U any](slice1 Slice[T], slice2 Slice[U]) Slice[Pair[T, U]]",
+        "summary": "Zip pairs elements at the same index."
+      }
+    ]
+  },
+  {
+    "name": "JSON and HTTP client",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "Delete",
+        "signature": "func Delete(url string) (*HTTPResponse, error)",
+        "summary": "Delete sends a DELETE request with a new default HTTPClient."
+      },
+      {
+        "name": "FetchJSON",
+        "signature": "func FetchJSON(url string) (JSON, error)",
+        "summary": "FetchJSON GETs url and parses the body as a JSON object."
+      },
+      {
+        "name": "FetchJSONOr",
+        "signature": "func FetchJSONOr(url string) JSON",
+        "summary": "FetchJSONOr is FetchJSON, returning an empty object on any error (request, body read, or decode)."
+      },
+      {
+        "name": "FetchText",
+        "signature": "func FetchText(url string) (string, error)",
+        "summary": "FetchText GETs url and returns the body as a string."
+      },
+      {
+        "name": "FetchTextOr",
+        "signature": "func FetchTextOr(url, defaultValue string) string",
+        "summary": "FetchTextOr is FetchText, returning defaultValue on any error."
+      },
+      {
+        "name": "FromJSON",
+        "signature": "func FromJSON(jsonStr string) (JSON, error)",
+        "summary": "FromJSON parses a JSON object."
+      },
+      {
+        "name": "FromJSONOr",
+        "signature": "func FromJSONOr(jsonStr string) JSON",
+        "summary": "FromJSONOr parses a JSON object, or returns an empty one when jsonStr is not a valid object."
+      },
+      {
+        "name": "Get",
+        "signature": "func Get(url string) (*HTTPResponse, error)",
+        "summary": "Get sends a GET request with a new default HTTPClient."
+      },
+      {
+        "name": "HTTPClient",
+        "signature": "type HTTPClient struct",
+        "summary": "HTTPClient wraps http.Client with a base URL and default headers."
+      },
+      {
+        "name": "HTTPClient.Delete",
+        "signature": "func (h *HTTPClient) Delete(path string) (*HTTPResponse, error)",
+        "summary": "Delete sends a DELETE request."
+      },
+      {
+        "name": "HTTPClient.DeleteWithContext",
+        "signature": "func (h *HTTPClient) DeleteWithContext(ctx context.Context, path string) (*HTTPResponse, error)",
+        "summary": "DeleteWithContext is Delete with the caller's cancellation and deadline."
+      },
+      {
+        "name": "HTTPClient.Get",
+        "signature": "func (h *HTTPClient) Get(path string) (*HTTPResponse, error)",
+        "summary": "Get sends a GET request."
+      },
+      {
+        "name": "HTTPClient.GetWithContext",
+        "signature": "func (h *HTTPClient) GetWithContext(ctx context.Context, path string) (*HTTPResponse, error)",
+        "summary": "GetWithContext is Get with the caller's cancellation and deadline."
+      },
+      {
+        "name": "HTTPClient.Patch",
+        "signature": "func (h *HTTPClient) Patch(path string, body any) (*HTTPResponse, error)",
+        "summary": "Patch sends a PATCH request, encoding body as Post does."
+      },
+      {
+        "name": "HTTPClient.PatchWithContext",
+        "signature": "func (h *HTTPClient) PatchWithContext(ctx context.Context, path string, body any) (*HTTPResponse, error)",
+        "summary": "PatchWithContext is Patch with the caller's cancellation and deadline."
+      },
+      {
+        "name": "HTTPClient.Post",
+        "signature": "func (h *HTTPClient) Post(path string, body any) (*HTTPResponse, error)",
+        "summary": "Post sends a POST request."
+      },
+      {
+        "name": "HTTPClient.PostForm",
+        "signature": "func (h *HTTPClient) PostForm(path string, data url.Values) (*HTTPResponse, error)",
+        "summary": "PostForm sends data as an application/x-www-form-urlencoded POST."
+      },
+      {
+        "name": "HTTPClient.PostFormWithContext",
+        "signature": "func (h *HTTPClient) PostFormWithContext(ctx context.Context, path string, data url.Values) (*HTTPResponse, error)",
+        "summary": "PostFormWithContext is PostForm with the caller's cancellation and deadline."
+      },
+      {
+        "name": "HTTPClient.PostWithContext",
+        "signature": "func (h *HTTPClient) PostWithContext(ctx context.Context, path string, body any) (*HTTPResponse, error)",
+        "summary": "PostWithContext is Post with the caller's cancellation and deadline."
+      },
+      {
+        "name": "HTTPClient.Put",
+        "signature": "func (h *HTTPClient) Put(path string, body any) (*HTTPResponse, error)",
+        "summary": "Put sends a PUT request, encoding body as Post does."
+      },
+      {
+        "name": "HTTPClient.PutWithContext",
+        "signature": "func (h *HTTPClient) PutWithContext(ctx context.Context, path string, body any) (*HTTPResponse, error)",
+        "summary": "PutWithContext is Put with the caller's cancellation and deadline."
+      },
+      {
+        "name": "HTTPClient.WithAuth",
+        "signature": "func (h *HTTPClient) WithAuth(username, password string) *HTTPClient",
+        "summary": "WithAuth sends HTTP Basic credentials with every request."
+      },
+      {
+        "name": "HTTPClient.WithBaseURL",
+        "signature": "func (h *HTTPClient) WithBaseURL(baseURL string) *HTTPClient",
+        "summary": "WithBaseURL sets the URL that relative request paths are joined to."
+      },
+      {
+        "name": "HTTPClient.WithBearerToken",
+        "signature": "func (h *HTTPClient) WithBearerToken(token string) *HTTPClient",
+        "summary": "WithBearerToken sends \"Authorization: Bearer \u003ctoken\u003e\" with every request."
+      },
+      {
+        "name": "HTTPClient.WithHeader",
+        "signature": "func (h *HTTPClient) WithHeader(key, value string) *HTTPClient",
+        "summary": "WithHeader sets a header sent with every request."
+      },
+      {
+        "name": "HTTPClient.WithHeaders",
+        "signature": "func (h *HTTPClient) WithHeaders(headers map[string]string) *HTTPClient",
+        "summary": "WithHeaders sets several headers sent with every request."
+      },
+      {
+        "name": "HTTPClient.WithJSONHeaders",
+        "signature": "func (h *HTTPClient) WithJSONHeaders() *HTTPClient",
+        "summary": "WithJSONHeaders sends Content-Type and Accept as application/json."
+      },
+      {
+        "name": "HTTPClient.WithTimeout",
+        "signature": "func (h *HTTPClient) WithTimeout(timeout time.Duration) *HTTPClient",
+        "summary": "WithTimeout sets the total time limit for each request."
+      },
+      {
+        "name": "HTTPResponse",
+        "signature": "type HTTPResponse struct",
+        "summary": "HTTPResponse wraps an http.Response."
+      },
+      {
+        "name": "HTTPResponse.Close",
+        "signature": "func (r *HTTPResponse) Close() error",
+        "summary": "Close closes the response body."
+      },
+      {
+        "name": "HTTPResponse.Header",
+        "signature": "func (r *HTTPResponse) Header(key string) string",
+        "summary": "Header returns the first value of the response header key."
+      },
+      {
+        "name": "HTTPResponse.Headers",
+        "signature": "func (r *HTTPResponse) Headers() map[string][]string",
+        "summary": "Headers returns the response headers."
+      },
+      {
+        "name": "HTTPResponse.IsError",
+        "signature": "func (r *HTTPResponse) IsError() bool",
+        "summary": "IsError reports whether the status is 400 or above."
+      },
+      {
+        "name": "HTTPResponse.IsOK",
+        "signature": "func (r *HTTPResponse) IsOK() bool",
+        "summary": "IsOK reports whether the status is exactly 200."
+      },
+      {
+        "name": "HTTPResponse.IsSuccess",
+        "signature": "func (r *HTTPResponse) IsSuccess() bool",
+        "summary": "IsSuccess reports whether the status is 2xx."
+      },
+      {
+        "name": "HTTPResponse.JSON",
+        "signature": "func (r *HTTPResponse) JSON() (JSON, error)",
+        "summary": "JSON reads and closes the body and parses it as a JSON object."
+      },
+      {
+        "name": "HTTPResponse.JSONOr",
+        "signature": "func (r *HTTPResponse) JSONOr() JSON",
+        "summary": "JSONOr returns JSON, or an empty object when reading or parsing fails."
+      },
+      {
+        "name": "HTTPResponse.Parse",
+        "signature": "func (r *HTTPResponse) Parse(v any) error",
+        "summary": "Parse decodes the JSON body into v and closes the body."
+      },
+      {
+        "name": "HTTPResponse.StatusCode",
+        "signature": "func (r *HTTPResponse) StatusCode() int",
+        "summary": "StatusCode returns the HTTP status code."
+      },
+      {
+        "name": "HTTPResponse.Text",
+        "signature": "func (r *HTTPResponse) Text() (string, error)",
+        "summary": "Text reads and closes the body and returns it as a string."
+      },
+      {
+        "name": "HTTPResponse.TextOr",
+        "signature": "func (r *HTTPResponse) TextOr(defaultValue string) string",
+        "summary": "TextOr returns Text, or defaultValue when reading fails."
+      },
+      {
+        "name": "JSON",
+        "signature": "type JSON map[string]any",
+        "summary": "JSON is a decoded JSON object with typed getters."
+      },
+      {
+        "name": "JSON.Clone",
+        "signature": "func (j JSON) Clone() JSON",
+        "summary": "Clone returns a shallow copy: nested maps and slices are shared."
+      },
+      {
+        "name": "JSON.Delete",
+        "signature": "func (j JSON) Delete(key string) JSON",
+        "summary": "Delete removes key and returns j."
+      },
+      {
+        "name": "JSON.Get",
+        "signature": "func (j JSON) Get(key string) any",
+        "summary": "Get returns the value at key, or nil when it is missing."
+      },
+      {
+        "name": "JSON.GetBool",
+        "signature": "func (j JSON) GetBool(key string) bool",
+        "summary": "GetBool returns the bool at key, or false when it is missing or not a bool."
+      },
+      {
+        "name": "JSON.GetBoolOr",
+        "signature": "func (j JSON) GetBoolOr(key string, defaultValue bool) bool",
+        "summary": "GetBoolOr returns the bool at key, or defaultValue when it is missing or not a bool."
+      },
+      {
+        "name": "JSON.GetFloat",
+        "signature": "func (j JSON) GetFloat(key string) float64",
+        "summary": "GetFloat returns GetFloatOr(key, 0)."
+      },
+      {
+        "name": "JSON.GetFloatOr",
+        "signature": "func (j JSON) GetFloatOr(key string, defaultValue float64) float64",
+        "summary": "GetFloatOr returns the value at key as a float64."
+      },
+      {
+        "name": "JSON.GetInt",
+        "signature": "func (j JSON) GetInt(key string) int",
+        "summary": "GetInt returns GetIntOr(key, 0)."
+      },
+      {
+        "name": "JSON.GetIntOr",
+        "signature": "func (j JSON) GetIntOr(key string, defaultValue int) int",
+        "summary": "GetIntOr returns the value at key as an int."
+      },
+      {
+        "name": "JSON.GetJSON",
+        "signature": "func (j JSON) GetJSON(key string) JSON",
+        "summary": "GetJSON returns the nested object at key, or an empty JSON when it is missing, nil, or not an object."
+      },
+      {
+        "name": "JSON.GetSlice",
+        "signature": "func (j JSON) GetSlice(key string) []any",
+        "summary": "GetSlice returns the array at key, or an empty slice when it is missing or not a []any."
+      },
+      {
+        "name": "JSON.GetString",
+        "signature": "func (j JSON) GetString(key string) string",
+        "summary": "GetString returns the string at key, or \"\" when it is missing or not a string."
+      },
+      {
+        "name": "JSON.GetStringOr",
+        "signature": "func (j JSON) GetStringOr(key, defaultValue string) string",
+        "summary": "GetStringOr returns the string at key, or defaultValue when it is missing or not a string."
+      },
+      {
+        "name": "JSON.Has",
+        "signature": "func (j JSON) Has(key string) bool",
+        "summary": "Has reports whether key is present, even with a null value."
+      },
+      {
+        "name": "JSON.Keys",
+        "signature": "func (j JSON) Keys() []string",
+        "summary": "Keys returns the keys in no particular order."
+      },
+      {
+        "name": "JSON.Merge",
+        "signature": "func (j JSON) Merge(other JSON) JSON",
+        "summary": "Merge copies every key of other into j, overwriting existing keys, and returns j."
+      },
+      {
+        "name": "JSON.Set",
+        "signature": "func (j JSON) Set(key string, value any) JSON",
+        "summary": "Set stores value at key and returns j, allocating a map when j is nil."
+      },
+      {
+        "name": "JSON.ToPrettyString",
+        "signature": "func (j JSON) ToPrettyString() string",
+        "summary": "ToPrettyString encodes j as JSON indented by two spaces, or \"{}\" when encoding fails."
+      },
+      {
+        "name": "JSON.ToString",
+        "signature": "func (j JSON) ToString() string",
+        "summary": "ToString encodes j as compact JSON, or \"{}\" when encoding fails."
+      },
+      {
+        "name": "JSON.Values",
+        "signature": "func (j JSON) Values() []any",
+        "summary": "Values returns the values in no particular order."
+      },
+      {
+        "name": "NewHTTPClient",
+        "signature": "func NewHTTPClient() *HTTPClient",
+        "summary": "NewHTTPClient returns an HTTPClient with a 30-second timeout and no default headers."
+      },
+      {
+        "name": "NewJSON",
+        "signature": "func NewJSON() JSON",
+        "summary": "NewJSON returns an empty JSON object."
+      },
+      {
+        "name": "NewQueryParams",
+        "signature": "func NewQueryParams() *QueryParams",
+        "summary": "NewQueryParams returns an empty QueryParams."
+      },
+      {
+        "name": "ParseJSON",
+        "signature": "func ParseJSON[T any](jsonStr string) (T, error)",
+        "summary": "ParseJSON decodes jsonStr into a new T."
+      },
+      {
+        "name": "ParseJSONOr",
+        "signature": "func ParseJSONOr[T any](jsonStr string, defaultValue T) T",
+        "summary": "ParseJSONOr decodes jsonStr into a new T, or returns defaultValue when decoding fails."
+      },
+      {
+        "name": "Post",
+        "signature": "func Post(url string, body any) (*HTTPResponse, error)",
+        "summary": "Post sends body as a JSON POST with a new default HTTPClient."
+      },
+      {
+        "name": "PostForm",
+        "signature": "func PostForm(url string, data url.Values) (*HTTPResponse, error)",
+        "summary": "PostForm sends data as a form POST with a new default HTTPClient."
+      },
+      {
+        "name": "Put",
+        "signature": "func Put(url string, body any) (*HTTPResponse, error)",
+        "summary": "Put sends body as a JSON PUT with a new default HTTPClient."
+      },
+      {
+        "name": "QueryParams",
+        "signature": "type QueryParams struct",
+        "summary": "QueryParams builds a URL query string."
+      },
+      {
+        "name": "QueryParams.Add",
+        "signature": "func (qp *QueryParams) Add(key, value string) *QueryParams",
+        "summary": "Add adds value to key, keeping earlier values."
+      },
+      {
+        "name": "QueryParams.Set",
+        "signature": "func (qp *QueryParams) Set(key, value string) *QueryParams",
+        "summary": "Set sets key to value, replacing earlier values."
+      },
+      {
+        "name": "QueryParams.SetBool",
+        "signature": "func (qp *QueryParams) SetBool(key string, value bool) *QueryParams",
+        "summary": "SetBool sets key to \"true\" or \"false\"."
+      },
+      {
+        "name": "QueryParams.SetIf",
+        "signature": "func (qp *QueryParams) SetIf(condition bool, key, value string) *QueryParams",
+        "summary": "SetIf sets key to value when condition is true."
+      },
+      {
+        "name": "QueryParams.SetIfNotEmpty",
+        "signature": "func (qp *QueryParams) SetIfNotEmpty(key, value string) *QueryParams",
+        "summary": "SetIfNotEmpty sets key to value when value is not \"\"."
+      },
+      {
+        "name": "QueryParams.SetInt",
+        "signature": "func (qp *QueryParams) SetInt(key string, value int) *QueryParams",
+        "summary": "SetInt sets key to the decimal form of value."
+      },
+      {
+        "name": "QueryParams.String",
+        "signature": "func (qp *QueryParams) String() string",
+        "summary": "String returns the encoded query, sorted by key, without a leading \"?\"."
+      },
+      {
+        "name": "QueryParams.URL",
+        "signature": "func (qp *QueryParams) URL(baseURL string) string",
+        "summary": "URL appends the query to baseURL with \"?\", or with \"\u0026\" when baseURL already has a query."
+      },
+      {
+        "name": "QueryParams.Values",
+        "signature": "func (qp *QueryParams) Values() url.Values",
+        "summary": "Values returns the underlying url.Values, not a copy."
+      },
+      {
+        "name": "ToJSON",
+        "signature": "func ToJSON(v any) string",
+        "summary": "ToJSON encodes v as compact JSON, or \"{}\" when encoding fails."
+      },
+      {
+        "name": "ToPrettyJSON",
+        "signature": "func ToPrettyJSON(v any) string",
+        "summary": "ToPrettyJSON encodes v as JSON indented by two spaces, or \"{}\" when encoding fails."
+      }
+    ]
+  },
+  {
+    "name": "Error handling",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "Catch",
+        "signature": "func Catch(fn func() error, handler func(error))",
+        "summary": "Catch calls fn through Try and passes any error, including a recovered panic, to handler."
+      },
+      {
+        "name": "CatchValue",
+        "signature": "func CatchValue[T any](fn func() (T, error), handler func(error) T) T",
+        "summary": "CatchValue calls fn through TryValue and returns its value."
+      },
+      {
+        "name": "Chain",
+        "signature": "type Chain struct",
+        "summary": "Chain runs a sequence of steps and stops at the first error, which it keeps."
+      },
+      {
+        "name": "Chain.Do",
+        "signature": "func (c *Chain) Do(fn func() error) *Chain",
+        "summary": "Do calls fn unless an earlier step failed."
+      },
+      {
+        "name": "Chain.DoValue",
+        "signature": "func (c *Chain) DoValue(fn func() error) *Chain",
+        "summary": "DoValue is the same as Do."
+      },
+      {
+        "name": "Chain.Error",
+        "signature": "func (c *Chain) Error() error",
+        "summary": "Error returns the first error a step returned, or nil if every step succeeded."
+      },
+      {
+        "name": "Chain.Result",
+        "signature": "func (c *Chain) Result() error",
+        "summary": "Result is the same as Error."
+      },
+      {
+        "name": "Chain.Success",
+        "signature": "func (c *Chain) Success() bool",
+        "summary": "Success reports whether every step so far succeeded."
+      },
+      {
+        "name": "Default",
+        "signature": "func Default[T any](value T, err error, defaultValue T) T",
+        "summary": "Default returns value if err is nil, otherwise defaultValue."
+      },
+      {
+        "name": "ErrorHandler",
+        "signature": "type ErrorHandler struct",
+        "summary": "ErrorHandler controls what Must does with a non-nil error: log it with the caller's file and line, then panic."
+      },
+      {
+        "name": "ErrorHandler.Must",
+        "signature": "func (eh *ErrorHandler) Must(err error)",
+        "summary": "Must panics with err if err is not nil."
+      },
+      {
+        "name": "ErrorHandler.Silent",
+        "signature": "func (eh *ErrorHandler) Silent() *ErrorHandler",
+        "summary": "Silent makes Must panic without logging, for code that reports the panic at a higher level."
+      },
+      {
+        "name": "ErrorHandler.WithLogger",
+        "signature": "func (eh *ErrorHandler) WithLogger(logger func(string, ...any)) *ErrorHandler",
+        "summary": "WithLogger sets the printf-style function Must logs through."
+      },
+      {
+        "name": "ErrorInfo",
+        "signature": "type ErrorInfo struct",
+        "summary": "ErrorInfo pairs an error with the file, line, and function where GetErrorInfo was called."
+      },
+      {
+        "name": "ErrorInfo.String",
+        "signature": "func (ei *ErrorInfo) String() string",
+        "summary": "String formats the error as \"file:line in function: error\"."
+      },
+      {
+        "name": "GetErrorInfo",
+        "signature": "func GetErrorInfo(err error) *ErrorInfo",
+        "summary": "GetErrorInfo records err with the caller's file, line, and function name."
+      },
+      {
+        "name": "Ignore",
+        "signature": "func Ignore(err error)",
+        "summary": "Ignore discards err."
+      },
+      {
+        "name": "IgnoreValue",
+        "signature": "func IgnoreValue[T any](value T, err error) T",
+        "summary": "IgnoreValue returns value and discards err."
+      },
+      {
+        "name": "Must",
+        "signature": "func Must(err error)",
+        "summary": "Must panics with err if err is not nil, logging the caller's file and line first through the package default handler (see SetDefaultLogger and SetDefaultSilent)."
+      },
+      {
+        "name": "MustValue",
+        "signature": "func MustValue[T any](value T, err error) T",
+        "summary": "MustValue returns value if err is nil and otherwise panics like Must."
+      },
+      {
+        "name": "NewChain",
+        "signature": "func NewChain() *Chain",
+        "summary": "NewChain returns an empty Chain with no error."
+      },
+      {
+        "name": "NewErrorHandler",
+        "signature": "func NewErrorHandler() *ErrorHandler",
+        "summary": "NewErrorHandler returns an ErrorHandler that logs with log.Printf before panicking."
+      },
+      {
+        "name": "OrLog",
+        "signature": "func OrLog[T any](value T, err error) T",
+        "summary": "OrLog returns value if err is nil."
+      },
+      {
+        "name": "OrLogDefault",
+        "signature": "func OrLogDefault[T any](value T, err error, defaultValue T) T",
+        "summary": "OrLogDefault returns value if err is nil."
+      },
+      {
+        "name": "OrPanic",
+        "signature": "func OrPanic[T any](value T, err error) T",
+        "summary": "OrPanic returns value if err is nil and otherwise panics with err."
+      },
+      {
+        "name": "SetDefaultLogger",
+        "signature": "func SetDefaultLogger(logger func(string, ...any))",
+        "summary": "SetDefaultLogger sets the printf-style function the package-level Must and MustValue log through."
+      },
+      {
+        "name": "SetDefaultSilent",
+        "signature": "func SetDefaultSilent(silent bool)",
+        "summary": "SetDefaultSilent sets whether the package-level Must and MustValue skip logging before they panic."
+      },
+      {
+        "name": "Try",
+        "signature": "func Try(fn func() error) (err error)",
+        "summary": "Try calls fn and returns its error."
+      },
+      {
+        "name": "TryValue",
+        "signature": "func TryValue[T any](fn func() (T, error)) (result T, err error)",
+        "summary": "TryValue calls fn and returns its result, recovering a panic as Try does."
+      }
+    ]
+  },
+  {
+    "name": "Pointers and values",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "IsNil",
+        "signature": "func IsNil(v any) bool",
+        "summary": "IsNil reports whether v is nil, including a typed nil pointer, slice, map, channel, or func stored in an interface."
+      },
+      {
+        "name": "IsNotNil",
+        "signature": "func IsNotNil(v any) bool",
+        "summary": "IsNotNil is !IsNil(v)."
+      },
+      {
+        "name": "NewSafe",
+        "signature": "func NewSafe[T any](ptr *T) Safe[T]",
+        "summary": "NewSafe wraps ptr, which may be nil."
+      },
+      {
+        "name": "NewSafeMap",
+        "signature": "func NewSafeMap[K comparable, V any](m map[K]V) SafeMap[K, V]",
+        "summary": "NewSafeMap wraps m, which may be nil."
+      },
+      {
+        "name": "NewSafeSlice",
+        "signature": "func NewSafeSlice[T any](slice []T) SafeSlice[T]",
+        "summary": "NewSafeSlice wraps slice, which may be nil."
+      },
+      {
+        "name": "NewSafeString",
+        "signature": "func NewSafeString(s *string) SafeString",
+        "summary": "NewSafeString wraps s, which may be nil."
+      },
+      {
+        "name": "Ptr",
+        "signature": "func Ptr[T any](v T) *T",
+        "summary": "Ptr returns a pointer to a copy of v, for filling pointer fields from literals: Ptr(42), Ptr(\"name\")."
+      },
+      {
+        "name": "Safe",
+        "signature": "type Safe struct",
+        "summary": "Safe wraps a possibly nil pointer so a value can be read and transformed without nil checks."
+      },
+      {
+        "name": "Safe.Filter",
+        "signature": "func (s Safe[T]) Filter(predicate func(T) bool) Safe[T]",
+        "summary": "Filter returns s when its value is non-nil and predicate is true for it, and a nil Safe otherwise."
+      },
+      {
+        "name": "Safe.FlatMap",
+        "signature": "func (s Safe[T]) FlatMap(fn func(T) Safe[T]) Safe[T]",
+        "summary": "FlatMap returns fn applied to the value."
+      },
+      {
+        "name": "Safe.Get",
+        "signature": "func (s Safe[T]) Get() T",
+        "summary": "Get returns the wrapped value, or the zero value of T when it is nil."
+      },
+      {
+        "name": "Safe.GetOr",
+        "signature": "func (s Safe[T]) GetOr(defaultValue T) T",
+        "summary": "GetOr returns the wrapped value, or defaultValue when it is nil."
+      },
+      {
+        "name": "Safe.IfPresent",
+        "signature": "func (s Safe[T]) IfPresent(fn func(T))",
+        "summary": "IfPresent calls fn with the value when it is not nil."
+      },
+      {
+        "name": "Safe.IsNil",
+        "signature": "func (s Safe[T]) IsNil() bool",
+        "summary": "IsNil reports whether the wrapped pointer is nil."
+      },
+      {
+        "name": "Safe.IsNotNil",
+        "signature": "func (s Safe[T]) IsNotNil() bool",
+        "summary": "IsNotNil reports whether the wrapped pointer is not nil."
+      },
+      {
+        "name": "Safe.Map",
+        "signature": "func (s Safe[T]) Map(fn func(T) T) Safe[T]",
+        "summary": "Map returns a Safe holding fn applied to the value."
+      },
+      {
+        "name": "Safe.OrElse",
+        "signature": "func (s Safe[T]) OrElse(other Safe[T]) Safe[T]",
+        "summary": "OrElse returns s when its value is not nil, and other otherwise."
+      },
+      {
+        "name": "SafeMap",
+        "signature": "type SafeMap struct",
+        "summary": "SafeMap wraps a map, which may be nil, for lookups that return Safe values."
+      },
+      {
+        "name": "SafeMap.Get",
+        "signature": "func (sm SafeMap[K, V]) Get(key K) Safe[V]",
+        "summary": "Get returns a Safe holding a copy of the value at key, or a nil Safe when key is absent."
+      },
+      {
+        "name": "SafeMap.GetOr",
+        "signature": "func (sm SafeMap[K, V]) GetOr(key K, defaultValue V) V",
+        "summary": "GetOr returns the value at key, or defaultValue when key is absent."
+      },
+      {
+        "name": "SafeMap.Has",
+        "signature": "func (sm SafeMap[K, V]) Has(key K) bool",
+        "summary": "Has reports whether key is present."
+      },
+      {
+        "name": "SafeMap.IsEmpty",
+        "signature": "func (sm SafeMap[K, V]) IsEmpty() bool",
+        "summary": "IsEmpty reports whether the map has no entries."
+      },
+      {
+        "name": "SafeMap.IsNotEmpty",
+        "signature": "func (sm SafeMap[K, V]) IsNotEmpty() bool",
+        "summary": "IsNotEmpty reports whether the map has at least one entry."
+      },
+      {
+        "name": "SafeMap.Keys",
+        "signature": "func (sm SafeMap[K, V]) Keys() []K",
+        "summary": "Keys returns the keys in no particular order, or an empty slice for a nil map."
+      },
+      {
+        "name": "SafeMap.Len",
+        "signature": "func (sm SafeMap[K, V]) Len() int",
+        "summary": "Len returns the number of entries."
+      },
+      {
+        "name": "SafeMap.Values",
+        "signature": "func (sm SafeMap[K, V]) Values() []V",
+        "summary": "Values returns the values in no particular order, or an empty slice for a nil map."
+      },
+      {
+        "name": "SafeSlice",
+        "signature": "type SafeSlice struct",
+        "summary": "SafeSlice wraps a slice for bounds-checked element access."
+      },
+      {
+        "name": "SafeSlice.First",
+        "signature": "func (ss SafeSlice[T]) First() Safe[T]",
+        "summary": "First returns Get(0)."
+      },
+      {
+        "name": "SafeSlice.Get",
+        "signature": "func (ss SafeSlice[T]) Get(index int) Safe[T]",
+        "summary": "Get returns a Safe pointing at the element at index, or a nil Safe when index is out of range."
+      },
+      {
+        "name": "SafeSlice.IsEmpty",
+        "signature": "func (ss SafeSlice[T]) IsEmpty() bool",
+        "summary": "IsEmpty reports whether the slice has no elements."
+      },
+      {
+        "name": "SafeSlice.IsNotEmpty",
+        "signature": "func (ss SafeSlice[T]) IsNotEmpty() bool",
+        "summary": "IsNotEmpty reports whether the slice has at least one element."
+      },
+      {
+        "name": "SafeSlice.Last",
+        "signature": "func (ss SafeSlice[T]) Last() Safe[T]",
+        "summary": "Last returns a Safe pointing at the last element, or a nil Safe when the slice is empty."
+      },
+      {
+        "name": "SafeSlice.Len",
+        "signature": "func (ss SafeSlice[T]) Len() int",
+        "summary": "Len returns the number of elements."
+      },
+      {
+        "name": "SafeString",
+        "signature": "type SafeString struct",
+        "summary": "SafeString wraps a possibly nil *string."
+      },
+      {
+        "name": "SafeString.Contains",
+        "signature": "func (ss SafeString) Contains(substr string) bool",
+        "summary": "Contains reports whether the string contains substr."
+      },
+      {
+        "name": "SafeString.Get",
+        "signature": "func (ss SafeString) Get() string",
+        "summary": "Get returns the string, or \"\" when the pointer is nil."
+      },
+      {
+        "name": "SafeString.GetOr",
+        "signature": "func (ss SafeString) GetOr(defaultValue string) string",
+        "summary": "GetOr returns the string, or defaultValue when the pointer is nil."
+      },
+      {
+        "name": "SafeString.IsEmpty",
+        "signature": "func (ss SafeString) IsEmpty() bool",
+        "summary": "IsEmpty reports whether the pointer is nil or the string is \"\"."
+      },
+      {
+        "name": "SafeString.IsNotEmpty",
+        "signature": "func (ss SafeString) IsNotEmpty() bool",
+        "summary": "IsNotEmpty reports whether the pointer is non-nil and the string is not \"\"."
+      },
+      {
+        "name": "SafeString.Trim",
+        "signature": "func (ss SafeString) Trim() SafeString",
+        "summary": "Trim returns a SafeString holding the string without leading and trailing whitespace."
+      },
+      {
+        "name": "Value",
+        "signature": "func Value[T any](ptr *T) T",
+        "summary": "Value returns *ptr, or the zero value of T when ptr is nil."
+      },
+      {
+        "name": "ValueOr",
+        "signature": "func ValueOr[T any](ptr *T, defaultValue T) T",
+        "summary": "ValueOr returns *ptr, or defaultValue when ptr is nil."
+      }
+    ]
+  },
+  {
+    "name": "Files",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "AppendFile",
+        "signature": "func AppendFile(filename, content string) error",
+        "summary": "AppendFile appends content to filename, creating it with mode 0644 if it does not exist."
+      },
+      {
+        "name": "AppendLine",
+        "signature": "func AppendLine(filename, line string) error",
+        "summary": "AppendLine appends line to filename, adding a trailing newline when line lacks one."
+      },
+      {
+        "name": "CopyFile",
+        "signature": "func CopyFile(src, dst string) error",
+        "summary": "CopyFile copies the contents of src to dst, creating dst's parent directories and truncating an existing dst."
+      },
+      {
+        "name": "CreateDir",
+        "signature": "func CreateDir(path string) error",
+        "summary": "CreateDir creates path and any missing parents with mode 0755."
+      },
+      {
+        "name": "Dir",
+        "signature": "func Dir(path string) *DirHelper",
+        "summary": "Dir returns a DirHelper for path."
+      },
+      {
+        "name": "DirHelper",
+        "signature": "type DirHelper struct",
+        "summary": "DirHelper chains operations on one directory path."
+      },
+      {
+        "name": "DirHelper.Create",
+        "signature": "func (d *DirHelper) Create() *DirHelper",
+        "summary": "Create creates the directory and any missing parents."
+      },
+      {
+        "name": "DirHelper.Dirs",
+        "signature": "func (d *DirHelper) Dirs() []string",
+        "summary": "Dirs returns the paths of the directory's subdirectories."
+      },
+      {
+        "name": "DirHelper.Error",
+        "signature": "func (d *DirHelper) Error() error",
+        "summary": "Error returns the error from the first failed operation, or nil."
+      },
+      {
+        "name": "DirHelper.Exists",
+        "signature": "func (d *DirHelper) Exists() bool",
+        "summary": "Exists reports whether the path exists and is a directory."
+      },
+      {
+        "name": "DirHelper.Files",
+        "signature": "func (d *DirHelper) Files() []string",
+        "summary": "Files returns the paths of the directory's non-directory entries."
+      },
+      {
+        "name": "DirHelper.Find",
+        "signature": "func (d *DirHelper) Find(pattern string) []string",
+        "summary": "Find returns the files under the directory whose base name matches pattern (see FindFiles)."
+      },
+      {
+        "name": "DirHelper.List",
+        "signature": "func (d *DirHelper) List() ([]string, error)",
+        "summary": "List returns the paths of the directory's entries (see ListAll), or the stored error from an earlier step."
+      },
+      {
+        "name": "DirHelper.Path",
+        "signature": "func (d *DirHelper) Path() string",
+        "summary": "Path returns the directory path."
+      },
+      {
+        "name": "DirHelper.Remove",
+        "signature": "func (d *DirHelper) Remove() *DirHelper",
+        "summary": "Remove removes the directory and everything under it."
+      },
+      {
+        "name": "DirHelper.Walk",
+        "signature": "func (d *DirHelper) Walk() []string",
+        "summary": "Walk returns every non-directory under the directory (see WalkFiles)."
+      },
+      {
+        "name": "File",
+        "signature": "func File(path string) *FileHelper",
+        "summary": "File returns a FileHelper for path."
+      },
+      {
+        "name": "FileExists",
+        "signature": "func FileExists(filename string) bool",
+        "summary": "FileExists reports whether filename can be stat'd."
+      },
+      {
+        "name": "FileHelper",
+        "signature": "type FileHelper struct",
+        "summary": "FileHelper chains operations on one file path."
+      },
+      {
+        "name": "FileHelper.Append",
+        "signature": "func (f *FileHelper) Append(content string) *FileHelper",
+        "summary": "Append appends content to the file (see AppendFile)."
+      },
+      {
+        "name": "FileHelper.Copy",
+        "signature": "func (f *FileHelper) Copy(dst string) *FileHelper",
+        "summary": "Copy copies the file to dst (see CopyFile)."
+      },
+      {
+        "name": "FileHelper.Delete",
+        "signature": "func (f *FileHelper) Delete() *FileHelper",
+        "summary": "Delete removes the file."
+      },
+      {
+        "name": "FileHelper.Error",
+        "signature": "func (f *FileHelper) Error() error",
+        "summary": "Error returns the error from the first failed operation, or nil."
+      },
+      {
+        "name": "FileHelper.Exists",
+        "signature": "func (f *FileHelper) Exists() bool",
+        "summary": "Exists reports whether the path exists (see FileExists)."
+      },
+      {
+        "name": "FileHelper.Move",
+        "signature": "func (f *FileHelper) Move(dst string) *FileHelper",
+        "summary": "Move renames the file to dst (see MoveFile)."
+      },
+      {
+        "name": "FileHelper.Path",
+        "signature": "func (f *FileHelper) Path() string",
+        "summary": "Path returns the file path, which Move updates."
+      },
+      {
+        "name": "FileHelper.Read",
+        "signature": "func (f *FileHelper) Read() (string, error)",
+        "summary": "Read returns the file's contents, or the stored error from an earlier step."
+      },
+      {
+        "name": "FileHelper.ReadOr",
+        "signature": "func (f *FileHelper) ReadOr(defaultContent string) string",
+        "summary": "ReadOr returns the file's contents, or defaultContent when Read fails."
+      },
+      {
+        "name": "FileHelper.Size",
+        "signature": "func (f *FileHelper) Size() int64",
+        "summary": "Size returns the file size in bytes, or 0 when it cannot be stat'd."
+      },
+      {
+        "name": "FileHelper.Write",
+        "signature": "func (f *FileHelper) Write(content string) *FileHelper",
+        "summary": "Write replaces the file's contents (see WriteFile)."
+      },
+      {
+        "name": "FileNotExists",
+        "signature": "func FileNotExists(filename string) bool",
+        "summary": "FileNotExists is !FileExists(filename)."
+      },
+      {
+        "name": "FileSize",
+        "signature": "func FileSize(filename string) int64",
+        "summary": "FileSize returns the size of filename in bytes, or 0 when it cannot be stat'd."
+      },
+      {
+        "name": "FindFiles",
+        "signature": "func FindFiles(root, pattern string) []string",
+        "summary": "FindFiles returns every non-directory under root whose base name matches pattern (filepath.Match syntax)."
+      },
+      {
+        "name": "IsDir",
+        "signature": "func IsDir(path string) bool",
+        "summary": "IsDir reports whether path exists and is a directory."
+      },
+      {
+        "name": "IsFile",
+        "signature": "func IsFile(path string) bool",
+        "summary": "IsFile reports whether path exists and is not a directory."
+      },
+      {
+        "name": "ListAll",
+        "signature": "func ListAll(dir string) []string",
+        "summary": "ListAll returns the paths of every entry in dir, not recursing."
+      },
+      {
+        "name": "ListDirs",
+        "signature": "func ListDirs(dir string) []string",
+        "summary": "ListDirs returns the paths of the subdirectories of dir, not recursing."
+      },
+      {
+        "name": "ListFiles",
+        "signature": "func ListFiles(dir string) []string",
+        "summary": "ListFiles returns the paths (dir joined with the name) of the non-directory entries in dir, not recursing."
+      },
+      {
+        "name": "MoveFile",
+        "signature": "func MoveFile(src, dst string) error",
+        "summary": "MoveFile renames src to dst, creating dst's parent directories."
+      },
+      {
+        "name": "ReadFile",
+        "signature": "func ReadFile(filename string) (string, error)",
+        "summary": "ReadFile reads a whole file as a string."
+      },
+      {
+        "name": "ReadFileLines",
+        "signature": "func ReadFileLines(filename string) ([]string, error)",
+        "summary": "ReadFileLines reads a file and returns its lines without line endings (\"\\n\" or \"\\r\\n\")."
+      },
+      {
+        "name": "ReadFileOr",
+        "signature": "func ReadFileOr(filename, defaultContent string) string",
+        "summary": "ReadFileOr reads a file, returning defaultContent when it cannot be read for any reason (missing, unreadable, a directory)."
+      },
+      {
+        "name": "RemoveDir",
+        "signature": "func RemoveDir(path string) error",
+        "summary": "RemoveDir removes path and everything under it."
+      },
+      {
+        "name": "RemoveFile",
+        "signature": "func RemoveFile(filename string) error",
+        "summary": "RemoveFile removes filename, or an empty directory."
+      },
+      {
+        "name": "TempDir",
+        "signature": "func TempDir(pattern string) (string, error)",
+        "summary": "TempDir creates a directory in os.TempDir (see os.MkdirTemp) and returns its path."
+      },
+      {
+        "name": "TempFile",
+        "signature": "func TempFile(pattern string) (string, error)",
+        "summary": "TempFile creates an empty file in os.TempDir with a name built from pattern (see os.CreateTemp) and returns its path."
+      },
+      {
+        "name": "WalkDirs",
+        "signature": "func WalkDirs(root string) []string",
+        "summary": "WalkDirs returns the path of every directory under root, recursively, excluding root itself."
+      },
+      {
+        "name": "WalkFiles",
+        "signature": "func WalkFiles(root string) []string",
+        "summary": "WalkFiles returns the path of every non-directory under root, recursively."
+      },
+      {
+        "name": "WriteFile",
+        "signature": "func WriteFile(filename, content string) error",
+        "summary": "WriteFile writes content to filename with mode 0644, creating parent directories as needed."
+      }
+    ]
+  },
+  {
+    "name": "Environment",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "Env",
+        "signature": "type Env struct",
+        "summary": "Env reads configuration from .env files, the process environment, and values set in code."
+      },
+      {
+        "name": "Env.All",
+        "signature": "func (e *Env) All() map[string]string",
+        "summary": "All returns every variable from every source, merged with the same precedence as Get."
+      },
+      {
+        "name": "Env.Clear",
+        "signature": "func (e *Env) Clear()",
+        "summary": "Clear forgets every .env and Set value and the list of loaded files, so files can be loaded again."
+      },
+      {
+        "name": "Env.Dump",
+        "signature": "func (e *Env) Dump() map[string]string",
+        "summary": "Dump returns a copy of the values loaded from .env files and set with Set."
+      },
+      {
+        "name": "Env.Get",
+        "signature": "func (e *Env) Get(key string) string",
+        "summary": "Get returns the value for key: a value set in code, else the process environment, else a .env value (see Env for OverrideSystemEnv)."
+      },
+      {
+        "name": "Env.GetBool",
+        "signature": "func (e *Env) GetBool(key string) bool",
+        "summary": "GetBool reports whether the value for key is \"true\", \"1\", \"yes\", or \"on\", ignoring case."
+      },
+      {
+        "name": "Env.GetBoolOr",
+        "signature": "func (e *Env) GetBoolOr(key string, defaultValue bool) bool",
+        "summary": "GetBoolOr returns defaultValue when key is unset or empty, and GetBool otherwise."
+      },
+      {
+        "name": "Env.GetFloat",
+        "signature": "func (e *Env) GetFloat(key string) (float64, error)",
+        "summary": "GetFloat parses the value for key as a float64."
+      },
+      {
+        "name": "Env.GetFloatOr",
+        "signature": "func (e *Env) GetFloatOr(key string, defaultValue float64) float64",
+        "summary": "GetFloatOr returns the value for key as a float64, or defaultValue when it is unset, empty, or not a number."
+      },
+      {
+        "name": "Env.GetInt",
+        "signature": "func (e *Env) GetInt(key string) (int, error)",
+        "summary": "GetInt parses the value for key as an int."
+      },
+      {
+        "name": "Env.GetIntOr",
+        "signature": "func (e *Env) GetIntOr(key string, defaultValue int) int",
+        "summary": "GetIntOr returns the value for key as an int, or defaultValue when it is unset, empty, or not an integer."
+      },
+      {
+        "name": "Env.GetOr",
+        "signature": "func (e *Env) GetOr(key, defaultValue string) string",
+        "summary": "GetOr returns the value for key, or defaultValue when it is unset or empty."
+      },
+      {
+        "name": "Env.GetSlice",
+        "signature": "func (e *Env) GetSlice(key string) []string",
+        "summary": "GetSlice splits the value for key on commas and trims each part."
+      },
+      {
+        "name": "Env.Has",
+        "signature": "func (e *Env) Has(key string) bool",
+        "summary": "Has reports whether any source has key, even with an empty value."
+      },
+      {
+        "name": "Env.Keys",
+        "signature": "func (e *Env) Keys() []string",
+        "summary": "Keys returns the keys of All in no particular order."
+      },
+      {
+        "name": "Env.LoadConfig",
+        "signature": "func (e *Env) LoadConfig(config EnvConfig) error",
+        "summary": "LoadConfig loads config.Files (or the LoadDefault files), applies config.Defaults, and returns an error listing any config.Required key that is still unset."
+      },
+      {
+        "name": "Env.LoadDefault",
+        "signature": "func (e *Env) LoadDefault() error",
+        "summary": "LoadDefault loads .env, .env.local, and .env.development from the working directory, in that order, skipping any that do not exist."
+      },
+      {
+        "name": "Env.LoadFile",
+        "signature": "func (e *Env) LoadFile(filename string) error",
+        "summary": "LoadFile reads KEY=value lines from filename."
+      },
+      {
+        "name": "Env.LoadFiles",
+        "signature": "func (e *Env) LoadFiles(filenames ...string) error",
+        "summary": "LoadFiles calls LoadFile for each name in order and stops at the first error."
+      },
+      {
+        "name": "Env.LoadedFiles",
+        "signature": "func (e *Env) LoadedFiles() []string",
+        "summary": "LoadedFiles returns a copy of the names of the files loaded so far, in load order."
+      },
+      {
+        "name": "Env.Save",
+        "signature": "func (e *Env) Save(filename string) error",
+        "summary": "Save writes the current .env variables to filename, sorted by key."
+      },
+      {
+        "name": "Env.Set",
+        "signature": "func (e *Env) Set(key, value string)",
+        "summary": "Set sets a value in code (in memory only)."
+      },
+      {
+        "name": "Env.SetSystem",
+        "signature": "func (e *Env) SetSystem(key, value string) error",
+        "summary": "SetSystem calls Set and also sets key in the process environment."
+      },
+      {
+        "name": "Env.Validate",
+        "signature": "func (e *Env) Validate(required []string) error",
+        "summary": "Validate returns an error listing every key in required that no source has."
+      },
+      {
+        "name": "EnvConfig",
+        "signature": "type EnvConfig struct",
+        "summary": "EnvConfig configures Env.LoadConfig."
+      },
+      {
+        "name": "GetEnv",
+        "signature": "func GetEnv(key string) string",
+        "summary": "GetEnv returns the package-level Env's value for key (see Env.Get)."
+      },
+      {
+        "name": "GetEnvBool",
+        "signature": "func GetEnvBool(key string) bool",
+        "summary": "GetEnvBool reports whether the value for key is \"true\", \"1\", \"yes\", or \"on\", ignoring case."
+      },
+      {
+        "name": "GetEnvBoolOr",
+        "signature": "func GetEnvBoolOr(key string, defaultValue bool) bool",
+        "summary": "GetEnvBoolOr returns defaultValue when key is unset or empty, and GetEnvBool otherwise."
+      },
+      {
+        "name": "GetEnvInt",
+        "signature": "func GetEnvInt(key string) (int, error)",
+        "summary": "GetEnvInt parses the value for key as an int."
+      },
+      {
+        "name": "GetEnvIntOr",
+        "signature": "func GetEnvIntOr(key string, defaultValue int) int",
+        "summary": "GetEnvIntOr returns the value for key as an int, or defaultValue when it is unset, empty, or not an integer."
+      },
+      {
+        "name": "GetEnvOr",
+        "signature": "func GetEnvOr(key, defaultValue string) string",
+        "summary": "GetEnvOr returns the value for key, or defaultValue when it is unset or empty."
+      },
+      {
+        "name": "HasEnv",
+        "signature": "func HasEnv(key string) bool",
+        "summary": "HasEnv reports whether any source has key, even with an empty value."
+      },
+      {
+        "name": "LoadEnv",
+        "signature": "func LoadEnv(filenames ...string) error",
+        "summary": "LoadEnv loads the named .env files into the package-level Env, or the LoadDefault files when no names are given."
+      },
+      {
+        "name": "NewEnv",
+        "signature": "func NewEnv() *Env",
+        "summary": "NewEnv returns an empty Env."
+      },
+      {
+        "name": "RequireEnv",
+        "signature": "func RequireEnv(keys ...string) error",
+        "summary": "RequireEnv returns an error listing every key that no source has."
+      },
+      {
+        "name": "SetEnv",
+        "signature": "func SetEnv(key, value string) error",
+        "summary": "SetEnv sets key on the package-level Env and in the process environment."
+      }
+    ]
+  },
+  {
+    "name": "Logging",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "ConfigureLogger",
+        "signature": "func ConfigureLogger(config LoggerConfig)",
+        "summary": "ConfigureLogger applies config to the logger behind the package-level functions."
+      },
+      {
+        "name": "Debug",
+        "signature": "func Debug(format string, args ...any)",
+        "summary": "Debug logs a formatted message at DEBUG level through the default logger."
+      },
+      {
+        "name": "Error",
+        "signature": "func Error(format string, args ...any)",
+        "summary": "Error logs a formatted message at ERROR level through the default logger."
+      },
+      {
+        "name": "Fatal",
+        "signature": "func Fatal(format string, args ...any)",
+        "summary": "Fatal logs a formatted message at FATAL level through the default logger, then exits the process with status 1."
+      },
+      {
+        "name": "Info",
+        "signature": "func Info(format string, args ...any)",
+        "summary": "Info logs a formatted message at INFO level through the default logger."
+      },
+      {
+        "name": "Log",
+        "signature": "func Log(args ...any)",
+        "summary": "Log logs its arguments, joined as fmt.Sprint does, at DEBUG level."
+      },
+      {
+        "name": "LogError",
+        "signature": "func LogError(err error, context ...string)",
+        "summary": "LogError logs err at ERROR level as \"Error (context...): err\"."
+      },
+      {
+        "name": "LogErrorf",
+        "signature": "func LogErrorf(err error, format string, args ...any)",
+        "summary": "LogErrorf logs err at ERROR level with a formatted context, as \"Error (context): err\"."
+      },
+      {
+        "name": "LogLevel",
+        "signature": "type LogLevel int",
+        "summary": "LogLevel is a Logger severity."
+      },
+      {
+        "name": "LogLevel.Color",
+        "signature": "func (l LogLevel) Color() string",
+        "summary": "Color returns the ANSI escape that colors the level name, or the reset code for an unknown level."
+      },
+      {
+        "name": "LogLevel.String",
+        "signature": "func (l LogLevel) String() string",
+        "summary": "String returns the level name, such as \"WARN\", or \"UNKNOWN\"."
+      },
+      {
+        "name": "Logf",
+        "signature": "func Logf(format string, args ...any)",
+        "summary": "Logf logs a formatted message at DEBUG level."
+      },
+      {
+        "name": "Logger",
+        "signature": "type Logger struct",
+        "summary": "Logger writes leveled, printf-style log lines of the form \"2006-01-02 15:04:05 [LEVEL] [prefix] file:line message\"."
+      },
+      {
+        "name": "Logger.Debug",
+        "signature": "func (l *Logger) Debug(format string, args ...any)",
+        "summary": "Debug logs a formatted message at DEBUG level."
+      },
+      {
+        "name": "Logger.Error",
+        "signature": "func (l *Logger) Error(format string, args ...any)",
+        "summary": "Error logs a formatted message at ERROR level."
+      },
+      {
+        "name": "Logger.Fatal",
+        "signature": "func (l *Logger) Fatal(format string, args ...any)",
+        "summary": "Fatal logs a formatted message at FATAL level, then exits the process with status 1."
+      },
+      {
+        "name": "Logger.Info",
+        "signature": "func (l *Logger) Info(format string, args ...any)",
+        "summary": "Info logs a formatted message at INFO level."
+      },
+      {
+        "name": "Logger.SetColored",
+        "signature": "func (l *Logger) SetColored(colored bool) *Logger",
+        "summary": "SetColored turns ANSI colors on the level name on or off."
+      },
+      {
+        "name": "Logger.SetLevel",
+        "signature": "func (l *Logger) SetLevel(level LogLevel) *Logger",
+        "summary": "SetLevel sets the lowest level the logger writes."
+      },
+      {
+        "name": "Logger.SetOutput",
+        "signature": "func (l *Logger) SetOutput(w io.Writer) *Logger",
+        "summary": "SetOutput sets the writer log lines go to."
+      },
+      {
+        "name": "Logger.SetPrefix",
+        "signature": "func (l *Logger) SetPrefix(prefix string) *Logger",
+        "summary": "SetPrefix sets text written in brackets after the level on every line."
+      },
+      {
+        "name": "Logger.SetShowCaller",
+        "signature": "func (l *Logger) SetShowCaller(show bool) *Logger",
+        "summary": "SetShowCaller turns the caller's file:line on or off."
+      },
+      {
+        "name": "Logger.Warn",
+        "signature": "func (l *Logger) Warn(format string, args ...any)",
+        "summary": "Warn logs a formatted message at WARN level."
+      },
+      {
+        "name": "Logger.WithField",
+        "signature": "func (l *Logger) WithField(key, value string) *Logger",
+        "summary": "WithField returns a copy of the logger whose prefix gains \"key=value\"."
+      },
+      {
+        "name": "Logger.WithFields",
+        "signature": "func (l *Logger) WithFields(fields map[string]string) *Logger",
+        "summary": "WithFields returns a copy of the logger whose prefix gains \"key=value\" for each field, sorted by key."
+      },
+      {
+        "name": "LoggerConfig",
+        "signature": "type LoggerConfig struct",
+        "summary": "LoggerConfig holds the settings ConfigureLogger applies."
+      },
+      {
+        "name": "NewLogger",
+        "signature": "func NewLogger() *Logger",
+        "summary": "NewLogger returns a Logger that writes INFO and above to os.Stdout with colored level names and no caller information."
+      },
+      {
+        "name": "Print",
+        "signature": "func Print(args ...any)",
+        "summary": "Print logs its arguments, joined as fmt.Sprint does, at INFO level."
+      },
+      {
+        "name": "Printf",
+        "signature": "func Printf(format string, args ...any)",
+        "summary": "Printf logs a formatted message at INFO level."
+      },
+      {
+        "name": "SetLogColored",
+        "signature": "func SetLogColored(colored bool)",
+        "summary": "SetLogColored turns colored level names on or off for the package-level functions."
+      },
+      {
+        "name": "SetLogLevel",
+        "signature": "func SetLogLevel(level LogLevel)",
+        "summary": "SetLogLevel sets the lowest level the package-level functions write."
+      },
+      {
+        "name": "SetLogOutput",
+        "signature": "func SetLogOutput(w io.Writer)",
+        "summary": "SetLogOutput sets the writer the package-level functions write to."
+      },
+      {
+        "name": "SetLogShowCaller",
+        "signature": "func SetLogShowCaller(show bool)",
+        "summary": "SetLogShowCaller turns caller file:line on or off for the package-level functions."
+      },
+      {
+        "name": "SetupDevelopmentLogging",
+        "signature": "func SetupDevelopmentLogging()",
+        "summary": "SetupDevelopmentLogging makes the package-level functions write DEBUG and above to stdout, colored, with caller information."
+      },
+      {
+        "name": "SetupProductionLogging",
+        "signature": "func SetupProductionLogging()",
+        "summary": "SetupProductionLogging makes the package-level functions write INFO and above to stdout, uncolored, without caller information."
+      },
+      {
+        "name": "SetupTestLogging",
+        "signature": "func SetupTestLogging()",
+        "summary": "SetupTestLogging discards all package-level log output."
+      },
+      {
+        "name": "Warn",
+        "signature": "func Warn(format string, args ...any)",
+        "summary": "Warn logs a formatted message at WARN level through the default logger."
+      }
+    ]
+  },
+  {
+    "name": "Profiler",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "MemoryStats",
+        "signature": "type MemoryStats struct",
+        "summary": "MemoryStats is a snapshot of runtime memory figures, in megabytes, plus the GC count and goroutine count."
+      },
+      {
+        "name": "NewProfiler",
+        "signature": "func NewProfiler() *Profiler",
+        "summary": "NewProfiler returns an enabled Profiler with no data."
+      },
+      {
+        "name": "PathStats",
+        "signature": "type PathStats struct",
+        "summary": "PathStats summarizes the recorded requests for one path."
+      },
+      {
+        "name": "ProfileStats",
+        "signature": "type ProfileStats struct",
+        "summary": "ProfileStats is the snapshot GetStats returns."
+      },
+      {
+        "name": "Profiler",
+        "signature": "type Profiler struct",
+        "summary": "Profiler records request timings through its Middleware and named timings through StartTimer and TimeOperation."
+      },
+      {
+        "name": "Profiler.Disable",
+        "signature": "func (p *Profiler) Disable() *Profiler",
+        "summary": "Disable turns recording off and returns p."
+      },
+      {
+        "name": "Profiler.Enable",
+        "signature": "func (p *Profiler) Enable() *Profiler",
+        "summary": "Enable turns recording on and returns p."
+      },
+      {
+        "name": "Profiler.GetRequestsByPath",
+        "signature": "func (p *Profiler) GetRequestsByPath() map[string]PathStats",
+        "summary": "GetRequestsByPath returns timing statistics for each recorded path."
+      },
+      {
+        "name": "Profiler.GetStats",
+        "signature": "func (p *Profiler) GetStats() ProfileStats",
+        "summary": "GetStats returns a snapshot of the recorded requests, the named timers with at least one completed run, and current memory figures."
+      },
+      {
+        "name": "Profiler.GetTopSlowRequests",
+        "signature": "func (p *Profiler) GetTopSlowRequests(n int) []RequestProfile",
+        "summary": "GetTopSlowRequests returns up to n recorded requests, slowest first."
+      },
+      {
+        "name": "Profiler.IsEnabled",
+        "signature": "func (p *Profiler) IsEnabled() bool",
+        "summary": "IsEnabled reports whether the profiler is recording."
+      },
+      {
+        "name": "Profiler.Middleware",
+        "signature": "func (p *Profiler) Middleware() func(http.Handler) http.Handler",
+        "summary": "Middleware returns middleware that records each request's method, path, status, duration, and bytes allocated, for app.Use."
+      },
+      {
+        "name": "Profiler.PrintStats",
+        "signature": "func (p *Profiler) PrintStats()",
+        "summary": "PrintStats writes a readable summary of GetStats to stdout."
+      },
+      {
+        "name": "Profiler.Reset",
+        "signature": "func (p *Profiler) Reset()",
+        "summary": "Reset discards every recorded request and timer and restarts the uptime clock."
+      },
+      {
+        "name": "Profiler.StartTimer",
+        "signature": "func (p *Profiler) StartTimer(name string) *Timer",
+        "summary": "StartTimer starts a new run of the named timer and returns it."
+      },
+      {
+        "name": "Profiler.StatsHandler",
+        "signature": "func (p *Profiler) StatsHandler() http.Handler",
+        "summary": "StatsHandler returns an http.Handler that serves GetStats as JSON."
+      },
+      {
+        "name": "Profiler.StopTimer",
+        "signature": "func (p *Profiler) StopTimer(name string) time.Duration",
+        "summary": "StopTimer stops the most recently started run of the named timer that is still running and returns its duration, or 0 when none is running."
+      },
+      {
+        "name": "Profiler.TimeOperation",
+        "signature": "func (p *Profiler) TimeOperation(name string, fn func()) (duration time.Duration)",
+        "summary": "TimeOperation calls fn, records the run under name, and returns its duration."
+      },
+      {
+        "name": "Profiler.TimeOperationWithResult",
+        "signature": "func (p *Profiler) TimeOperationWithResult(name string, fn func() any) (result any, duration time.Duration)",
+        "summary": "TimeOperationWithResult is TimeOperation for a function that returns a value; it returns that value and the duration."
+      },
+      {
+        "name": "RequestProfile",
+        "signature": "type RequestProfile struct",
+        "summary": "RequestProfile is one request the Middleware recorded."
+      },
+      {
+        "name": "Timer",
+        "signature": "type Timer struct",
+        "summary": "Timer is one run of a named timer, returned by StartTimer."
+      },
+      {
+        "name": "Timer.Stop",
+        "signature": "func (t *Timer) Stop() time.Duration",
+        "summary": "Stop ends this run, records it in the timer's statistics, and returns its duration."
+      },
+      {
+        "name": "TimerStats",
+        "signature": "type TimerStats struct",
+        "summary": "TimerStats summarizes the completed runs of one named timer."
+      }
+    ]
+  },
+  {
+    "name": "Live reload (Air)",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "AirBuildConfig",
+        "signature": "type AirBuildConfig struct",
+        "summary": "AirBuildConfig is the [build] section of an Air configuration."
+      },
+      {
+        "name": "AirConfig",
+        "signature": "type AirConfig struct",
+        "summary": "AirConfig is an Air live-reload configuration."
+      },
+      {
+        "name": "AirConfig.SaveAirConfig",
+        "signature": "func (ac *AirConfig) SaveAirConfig(filename string) error",
+        "summary": "SaveAirConfig writes ToTOML to filename, or to .air.toml when filename is empty."
+      },
+      {
+        "name": "AirConfig.ToTOML",
+        "signature": "func (ac *AirConfig) ToTOML() string",
+        "summary": "ToTOML renders the configuration as the contents of an .air.toml file, with the [build], [color], log, and [misc] sections."
+      },
+      {
+        "name": "AirHelper",
+        "signature": "type AirHelper struct",
+        "summary": "AirHelper sets up Air for the project in one directory."
+      },
+      {
+        "name": "AirHelper.AddBuildArgs",
+        "signature": "func (ah *AirHelper) AddBuildArgs(args ...string) *AirHelper",
+        "summary": "AddBuildArgs adds arguments Air passes to the binary when it runs it."
+      },
+      {
+        "name": "AirHelper.AddExcludeDir",
+        "signature": "func (ah *AirHelper) AddExcludeDir(directories ...string) *AirHelper",
+        "summary": "AddExcludeDir adds directories Air does not watch."
+      },
+      {
+        "name": "AirHelper.AddWatchExt",
+        "signature": "func (ah *AirHelper) AddWatchExt(extensions ...string) *AirHelper",
+        "summary": "AddWatchExt adds file extensions, without dots, that trigger a rebuild."
+      },
+      {
+        "name": "AirHelper.CreateDevScript",
+        "signature": "func (ah *AirHelper) CreateDevScript() error",
+        "summary": "CreateDevScript writes an executable dev.sh to the project root."
+      },
+      {
+        "name": "AirHelper.GetInstallInstructions",
+        "signature": "func (ah *AirHelper) GetInstallInstructions() string",
+        "summary": "GetInstallInstructions returns text describing the ways to install Air."
+      },
+      {
+        "name": "AirHelper.InitAir",
+        "signature": "func (ah *AirHelper) InitAir() error",
+        "summary": "InitAir creates tmp/ and writes .air.toml in the project root."
+      },
+      {
+        "name": "AirHelper.IsAirInstalled",
+        "signature": "func (ah *AirHelper) IsAirInstalled() bool",
+        "summary": "IsAirInstalled reports whether an air binary exists in /usr/local/bin, /usr/bin, $GOPATH/bin, or $HOME/go/bin."
+      },
+      {
+        "name": "AirHelper.SetBinPath",
+        "signature": "func (ah *AirHelper) SetBinPath(path string) *AirHelper",
+        "summary": "SetBinPath sets the path of the binary Air runs after a build."
+      },
+      {
+        "name": "AirHelper.SetBuildCmd",
+        "signature": "func (ah *AirHelper) SetBuildCmd(cmd string) *AirHelper",
+        "summary": "SetBuildCmd sets the command Air runs to build the binary."
+      },
+      {
+        "name": "AirHelper.UpdateConfig",
+        "signature": "func (ah *AirHelper) UpdateConfig(modifier func(*AirConfig)) *AirHelper",
+        "summary": "UpdateConfig calls modifier with the configuration so it can change any field."
+      },
+      {
+        "name": "AirInstallHelp",
+        "signature": "func AirInstallHelp() string",
+        "summary": "AirInstallHelp returns text describing the ways to install Air."
+      },
+      {
+        "name": "AirLogConfig",
+        "signature": "type AirLogConfig struct",
+        "summary": "AirLogConfig is the log section of an Air configuration."
+      },
+      {
+        "name": "AirMiscConfig",
+        "signature": "type AirMiscConfig struct",
+        "summary": "AirMiscConfig is the [misc] section of an Air configuration."
+      },
+      {
+        "name": "AirWatchConfig",
+        "signature": "type AirWatchConfig struct",
+        "summary": "AirWatchConfig holds the watch lists kept in AirConfig.Watch."
+      },
+      {
+        "name": "CreateHyperChiAirConfig",
+        "signature": "func CreateHyperChiAirConfig(filename string) error",
+        "summary": "CreateHyperChiAirConfig writes HyperChiAirConfig to filename, or to .air.toml when filename is empty."
+      },
+      {
+        "name": "DefaultAirConfig",
+        "signature": "func DefaultAirConfig() *AirConfig",
+        "summary": "DefaultAirConfig returns an Air configuration that builds ./tmp/main from the current directory and watches Go, template, HTML, JS, and CSS files."
+      },
+      {
+        "name": "HyperChiAirConfig",
+        "signature": "func HyperChiAirConfig() *AirConfig",
+        "summary": "HyperChiAirConfig returns DefaultAirConfig extended for a HyperChi project: it also watches .md, .env, .gotmpl, and .gohtml files and skips the static, uploads, logs, storage, and cache directories."
+      },
+      {
+        "name": "InitAirConfig",
+        "signature": "func InitAirConfig() error",
+        "summary": "InitAirConfig runs AirHelper.InitAir in the current directory."
+      },
+      {
+        "name": "IsAirAvailable",
+        "signature": "func IsAirAvailable() bool",
+        "summary": "IsAirAvailable reports whether Air is installed (see AirHelper.IsAirInstalled)."
+      },
+      {
+        "name": "NewAirHelper",
+        "signature": "func NewAirHelper(projectRoot string) *AirHelper",
+        "summary": "NewAirHelper returns an AirHelper for projectRoot, or for the current directory when projectRoot is empty."
+      }
+    ]
+  },
+  {
+    "name": "Deployment",
+    "import": "github.com/regiellis/hyperchi/hyperchi/helpers",
+    "entries": [
+      {
+        "name": "CreateDeploymentFiles",
+        "signature": "func CreateDeploymentFiles(projectRoot, appName string) error",
+        "summary": "CreateDeploymentFiles writes every deployment file for appName into projectRoot: Dockerfile, compose file, production .env, build and deploy scripts, nginx and systemd configs, and a health check."
+      },
+      {
+        "name": "DeploymentConfig",
+        "signature": "type DeploymentConfig struct",
+        "summary": "DeploymentConfig describes how an app is deployed."
+      },
+      {
+        "name": "DeploymentHelper",
+        "signature": "type DeploymentHelper struct",
+        "summary": "DeploymentHelper writes deployment files (Dockerfile, compose file, scripts, server configs) for one project directory and app name."
+      },
+      {
+        "name": "DeploymentHelper.CreateBuildScript",
+        "signature": "func (dh *DeploymentHelper) CreateBuildScript() error",
+        "summary": "CreateBuildScript writes an executable build.sh that cross-compiles release archives into dist/ and builds a Docker image."
+      },
+      {
+        "name": "DeploymentHelper.CreateDeployScript",
+        "signature": "func (dh *DeploymentHelper) CreateDeployScript() error",
+        "summary": "CreateDeployScript writes an executable deploy.sh."
+      },
+      {
+        "name": "DeploymentHelper.CreateDeploymentFiles",
+        "signature": "func (dh *DeploymentHelper) CreateDeploymentFiles() error",
+        "summary": "CreateDeploymentFiles writes the Dockerfile, docker-compose.yml, systemd unit, deploy.sh, and nginx.conf."
+      },
+      {
+        "name": "DeploymentHelper.CreateDockerCompose",
+        "signature": "func (dh *DeploymentHelper) CreateDockerCompose() error",
+        "summary": "CreateDockerCompose writes docker-compose.yml with the app service on port 8080, a data volume, and an nginx service in front of it."
+      },
+      {
+        "name": "DeploymentHelper.CreateDockerfile",
+        "signature": "func (dh *DeploymentHelper) CreateDockerfile() error",
+        "summary": "CreateDockerfile writes a multi-stage Dockerfile, and a .dockerignore when the project has none."
+      },
+      {
+        "name": "DeploymentHelper.CreateHealthCheck",
+        "signature": "func (dh *DeploymentHelper) CreateHealthCheck() error",
+        "summary": "CreateHealthCheck writes health.go, standard-library health, readiness, and liveness handlers for package main."
+      },
+      {
+        "name": "DeploymentHelper.CreateNginxConfig",
+        "signature": "func (dh *DeploymentHelper) CreateNginxConfig() error",
+        "summary": "CreateNginxConfig writes nginx.conf, a reverse proxy in front of the app on port 8080."
+      },
+      {
+        "name": "DeploymentHelper.CreateProductionEnv",
+        "signature": "func (dh *DeploymentHelper) CreateProductionEnv() error",
+        "summary": "CreateProductionEnv writes a .env.production template with mode 0600."
+      },
+      {
+        "name": "DeploymentHelper.CreateSystemdService",
+        "signature": "func (dh *DeploymentHelper) CreateSystemdService() error",
+        "summary": "CreateSystemdService writes \u003cappName\u003e.service, a systemd unit that runs the app."
+      },
+      {
+        "name": "DeploymentHelper.DefaultDeploymentConfig",
+        "signature": "func (dh *DeploymentHelper) DefaultDeploymentConfig() *DeploymentConfig",
+        "summary": "DefaultDeploymentConfig returns a production config for linux/amd64 on port 8080 with a /health check."
+      },
+      {
+        "name": "DeploymentHelper.GetBuildInfo",
+        "signature": "func (dh *DeploymentHelper) GetBuildInfo() map[string]string",
+        "summary": "GetBuildInfo returns the Go version, OS, architecture, current UTC time, app name, and a Unix-time deployment ID as strings."
+      },
+      {
+        "name": "DeploymentHelper.GetProductionConfig",
+        "signature": "func (dh *DeploymentHelper) GetProductionConfig() *ProductionConfig",
+        "summary": "GetProductionConfig returns recommended production settings as a ProductionConfig."
+      },
+      {
+        "name": "DeploymentHelper.SwitchToProduction",
+        "signature": "func (dh *DeploymentHelper) SwitchToProduction() error",
+        "summary": "SwitchToProduction loads .env.production from the project root and returns an error when APP_NAME, ENVIRONMENT, JWT_SECRET, or SESSION_SECRET is missing."
+      },
+      {
+        "name": "NewDeploymentHelper",
+        "signature": "func NewDeploymentHelper(projectRoot, appName string) *DeploymentHelper",
+        "summary": "NewDeploymentHelper returns a DeploymentHelper for projectRoot (default \".\") and appName (default \"hyperchi-app\")."
+      },
+      {
+        "name": "ProductionConfig",
+        "signature": "type ProductionConfig struct",
+        "summary": "ProductionConfig is a set of recommended production settings returned by GetProductionConfig."
+      },
+      {
+        "name": "SwitchEnvironment",
+        "signature": "func SwitchEnvironment(env string) error",
+        "summary": "SwitchEnvironment copies .env.\u003cenv\u003e over .env in the working directory."
+      }
+    ]
+  }
+]

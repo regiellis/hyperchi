@@ -1,0 +1,77 @@
+{{/* devlog is the index. c.View renders it inside the layout for a normal
+     visit and alone for the htmx requests its filter and pager links make,
+     which swap it into #main and push the URL. */}}
+{{define "devlog"}}{{with .devlog}}
+<div class="wrap devlog" data-page-title="{{$.meta.Title}}">
+  <header class="page-head">
+    <p class="eyebrow">Devlog</p>
+    <h1 tabindex="-1">{{if .Tag}}Posts tagged “{{.Tag}}”{{else}}Notes from the studio{{end}}</h1>
+    <p class="lede">Design, art, sound, and the business of a three-person studio. Follow along with the <a href="/devlog/feed.xml">Atom feed</a>.</p>
+  </header>
+
+  <nav class="tag-filter" aria-label="Filter posts by tag">
+    <ul>
+      <li><a href="{{.AllURL}}" hx-get="{{.AllURL}}" hx-target="#main" hx-push-url="true"{{if not .Tag}} aria-current="page"{{end}}>All</a></li>
+      {{- range .Tags}}
+      <li><a href="/devlog?tag={{.Name}}" hx-get="/devlog?tag={{.Name}}" hx-target="#main" hx-push-url="true"{{if eq .Name $.devlog.Tag}} aria-current="page"{{end}}>{{.Name}} <span class="count">{{.Count}}</span></a></li>
+      {{- end}}
+    </ul>
+  </nav>
+
+  <p class="result-count">{{.Total}} {{if eq .Total 1}}post{{else}}posts{{end}}{{if gt .Pages 1}}<span aria-hidden="true"> · </span>page {{.Page}} of {{.Pages}}{{end}}</p>
+  <h2 class="sr-only">Posts</h2>
+  <ol class="post-list">
+    {{- range .Posts}}{{template "post-item" (dict "post" . "hx" true)}}{{end}}
+  </ol>
+
+  {{- if gt .Pages 1}}
+  <nav class="pager" aria-label="Devlog pages">
+    {{- with .NewerURL}}
+    <a class="pager-step" href="{{.}}" hx-get="{{.}}" hx-target="#main" hx-push-url="true"><span aria-hidden="true">←</span> Newer</a>
+    {{- end}}
+    <ul>
+      {{- range .PageURLs}}
+      <li><a href="{{.URL}}" hx-get="{{.URL}}" hx-target="#main" hx-push-url="true"{{if .Current}} aria-current="page"{{end}}><span class="sr-only">Page </span>{{.Number}}</a></li>
+      {{- end}}
+    </ul>
+    {{- with .OlderURL}}
+    <a class="pager-step" href="{{.}}" hx-get="{{.}}" hx-target="#main" hx-push-url="true">Older <span aria-hidden="true">→</span></a>
+    {{- end}}
+  </nav>
+  {{- end}}
+</div>
+{{end}}{{end}}
+
+{{define "post"}}{{with .post}}
+<article class="wrap post">
+  <header class="post-head">
+    <p class="eyebrow"><a href="/devlog">Devlog</a>{{with .Game}}<span aria-hidden="true"> · </span><a href="{{.Path}}">{{.Title}}</a>{{end}}</p>
+    <h1>{{.Title}}</h1>
+    <p class="lede">{{.Summary}}</p>
+    <p class="post-meta"><time datetime="{{.Date.Format "2006-01-02"}}">{{.Date.Format "2 January 2006"}}</time><span aria-hidden="true"> · </span>{{.Author}}<span aria-hidden="true"> · </span>{{.ReadMinutes}} min read</p>
+    {{template "tags" (dict "tags" .Tags "hx" false)}}
+  </header>
+  <div class="post-layout">
+    {{- if .TOC}}
+    <nav class="toc" aria-labelledby="toc-heading">
+      <h2 id="toc-heading">On this page</h2>
+      <ol>
+        {{- range .TOC}}
+        <li class="toc-level-{{.Level}}"><a href="#{{.ID}}">{{.Text}}</a></li>
+        {{- end}}
+      </ol>
+    </nav>
+    {{- end}}
+    <div class="prose">{{.Body}}</div>
+  </div>
+  <nav class="post-nav" aria-label="More posts">
+    {{- with .Older}}
+    <a class="post-nav-older" href="{{.Path}}"><span class="post-nav-label"><span aria-hidden="true">←</span> Older post</span><span class="post-nav-title">{{.Title}}</span></a>
+    {{- end}}
+    {{- with .Newer}}
+    <a class="post-nav-newer" href="{{.Path}}"><span class="post-nav-label">Newer post <span aria-hidden="true">→</span></span><span class="post-nav-title">{{.Title}}</span></a>
+    {{- end}}
+  </nav>
+  <p class="post-cta">Want the next post when it goes up? <a href="/newsletter">Join the list</a> or subscribe to the <a href="/devlog/feed.xml">Atom feed</a>.</p>
+</article>
+{{end}}{{end}}

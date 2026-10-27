@@ -1,0 +1,22 @@
+# Mailgrid: Air live-reload config. Static files are embedded, so editing
+# them also needs a rebuild. The SQLite driver is pure Go.
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "CGO_ENABLED=0 go build -o ./tmp/mailgrid ."
+  bin = "./tmp/mailgrid"
+  delay = 500
+  include_ext = ["go", "js", "css", "svg"]
+  exclude_dir = ["tmp", "data"]
+  exclude_regex = ["_test.go"]
+  kill_delay = "2s"
+  send_interrupt = true
+  log = "build-errors.log"
+
+[log]
+  time = false
+
+[misc]
+  clean_on_exit = true
