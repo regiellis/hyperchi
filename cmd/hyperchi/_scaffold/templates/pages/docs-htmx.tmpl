@@ -1,0 +1,126 @@
+{{define "docs-htmx"}}
+<div class="max-w-6xl mx-auto px-6 py-10 flex gap-12">
+    {{template "sidebar" .}}
+
+    <article class="prose flex-1 max-w-3xl">
+        <h1>HTMX</h1>
+        <p class="lede">HTML attributes that issue server requests and swap fragments.
+        Your HTML <em>is</em> the API.</p>
+
+        <p>HyperChi ships with htmx 4 (currently beta). The library reads attributes off
+        your DOM, fires <code>fetch()</code> requests, and replaces target elements with the
+        response. No JavaScript on your part: just templates and handlers.</p>
+
+        <h2 id="verbs">Request verbs</h2>
+        <p>Five attributes, one per HTTP method:</p>
+        <pre class="code-block" data-lang="html"><code>&lt;button hx-get=&quot;/api/items&quot;&gt;Load&lt;/button&gt;
+&lt;form hx-post=&quot;/api/items&quot;&gt;...&lt;/form&gt;
+&lt;button hx-put=&quot;/api/items/42&quot;&gt;Update&lt;/button&gt;
+&lt;button hx-patch=&quot;/api/items/42&quot;&gt;Patch&lt;/button&gt;
+&lt;button hx-delete=&quot;/api/items/42&quot;&gt;Delete&lt;/button&gt;</code></pre>
+        <p>htmx 4 also adds <code>hx-action</code> + <code>hx-method</code> for cases where
+        the verb is dynamic (e.g. driven by state).</p>
+
+        <h2 id="target">hx-target: where the response goes</h2>
+        <p>By default the response replaces the element that triggered it. Override with
+        a CSS selector or one of the relative keywords:</p>
+        <pre class="code-block" data-lang="html"><code>&lt;!-- Replace another element by id --&gt;
+&lt;button hx-get=&quot;/time&quot; hx-target=&quot;#out&quot;&gt;Get time&lt;/button&gt;
+
+&lt;!-- Replace the closest matching ancestor --&gt;
+&lt;button hx-delete=&quot;/items/1&quot; hx-target=&quot;closest tr&quot;&gt;×&lt;/button&gt;
+
+&lt;!-- Replace a child --&gt;
+&lt;div hx-get=&quot;/widget&quot; hx-target=&quot;find .widget&quot;&gt;...&lt;/div&gt;
+
+&lt;!-- Replace self --&gt;
+&lt;div hx-get=&quot;/widget&quot; hx-target=&quot;this&quot;&gt;...&lt;/div&gt;</code></pre>
+
+        <h2 id="swap">hx-swap: how the response is placed</h2>
+        <pre class="code-block" data-lang="html"><code>hx-swap=&quot;innerHTML&quot;     &lt;!-- default: replace inner content --&gt;
+hx-swap=&quot;outerHTML&quot;     &lt;!-- replace the element itself --&gt;
+hx-swap=&quot;beforeend&quot;     &lt;!-- append inside --&gt;
+hx-swap=&quot;afterbegin&quot;    &lt;!-- prepend inside --&gt;
+hx-swap=&quot;before&quot;        &lt;!-- insert before the element (alias: beforebegin) --&gt;
+hx-swap=&quot;after&quot;         &lt;!-- insert after the element (alias: afterend) --&gt;
+hx-swap=&quot;textContent&quot;   &lt;!-- set text content (no HTML parsing) --&gt;
+hx-swap=&quot;delete&quot;        &lt;!-- remove the target --&gt;
+hx-swap=&quot;none&quot;          &lt;!-- discard the response --&gt;
+hx-swap=&quot;innerMorph&quot;    &lt;!-- morph (idiomorph), preserves form state --&gt;
+hx-swap=&quot;outerMorph&quot;</code></pre>
+
+        <h2 id="trigger">hx-trigger: when to fire</h2>
+        <p>Defaults to <code>click</code> for buttons / <code>change</code> for inputs /
+        <code>submit</code> for forms. Override for everything else:</p>
+        <pre class="code-block" data-lang="html"><code>&lt;!-- on page load --&gt;
+&lt;div hx-get=&quot;/banner&quot; hx-trigger=&quot;load once&quot;&gt;&lt;/div&gt;
+
+&lt;!-- when scrolled into view --&gt;
+&lt;div hx-get=&quot;/comments&quot; hx-trigger=&quot;intersect once&quot;&gt;&lt;/div&gt;
+
+&lt;!-- poll every 30 seconds --&gt;
+&lt;div hx-get=&quot;/feed&quot; hx-trigger=&quot;every 30s&quot;&gt;&lt;/div&gt;
+
+&lt;!-- search-as-you-type with debounce --&gt;
+&lt;input hx-get=&quot;/search&quot; hx-trigger=&quot;input changed delay:300ms&quot;
+       hx-target=&quot;#results&quot; name=&quot;q&quot;&gt;</code></pre>
+
+        <h2 id="boost">hx-boost: turn anchors into AJAX</h2>
+        <p>Set on a parent (or <code>&lt;body&gt;</code>) and ordinary links and forms
+        become htmx requests targeting the body. You get smooth navigation and View
+        Transitions for free.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;body hx-boost=&quot;true&quot;&gt;
+  &lt;a href=&quot;/about&quot;&gt;About&lt;/a&gt; &lt;!-- now an htmx swap --&gt;
+&lt;/body&gt;</code></pre>
+        <p>This site uses it. Click between sidebar links: no full reload.</p>
+
+        <h2 id="fragments">Server-rendered fragments</h2>
+        <p>Your handler returns an HTML fragment, your template defines it.
+        <code>c.Fragment(name, data)</code> renders just the named template, no layout.
+        <code>c.View</code> does the same for an htmx request and adds the layout for a
+        normal page load:</p>
+        <pre class="code-block" data-lang="go"><code>app.Get(&quot;/api/time&quot;, func(c *hyperchi.Context) error {
+    return c.Fragment(&quot;time&quot;, hyperchi.H{
+        &quot;now&quot;: time.Now().Format(time.RFC1123),
+    })
+})</code></pre>
+        <pre class="code-block" data-lang="html"><code>&lt;!-- templates/components/time.tmpl --&gt;
+{{`{{define "time"}}`}}
+&lt;span&gt;{{`{{.now}}`}}&lt;/span&gt;
+{{`{{end}}`}}</code></pre>
+
+        <div class="demo">
+            <div class="demo-label">Live: clicking fires <code>hx-get="/api/time"</code></div>
+            <div class="flex items-center gap-3 flex-wrap">
+                <button class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-sm font-medium"
+                        hx-get="/api/time"
+                        hx-target="#htmx-time"
+                        hx-swap="innerHTML">
+                    What time is it?
+                </button>
+                <span id="htmx-time" class="text-sm text-slate-600 dark:text-slate-400">
+                    Click for the server time.
+                </span>
+            </div>
+        </div>
+
+        <h2 id="response-control">Response-driven swap control</h2>
+        <p>Your server can override the swap from the response side. <code>c.HX()</code> sets the htmx response headers and chains into the response:</p>
+        <pre class="code-block" data-lang="go"><code>return c.HX().
+    Retarget(&quot;#errors&quot;).  // change target
+    Reswap(&quot;outerHTML&quot;).  // change swap mode
+    Trigger(&quot;saved&quot;).     // fire a client event
+    PushURL(&quot;/saved&quot;).    // update the URL
+    Fragment(&quot;errors&quot;, data)</code></pre>
+        <p>The same helper reads the request side: <code>c.HX().Target()</code>, <code>Source()</code>, <code>CurrentURL()</code>, and <code>Boosted()</code>.</p>
+
+        <h2 id="csrf">CSRF</h2>
+        <p><code>app.AutoMiddleware()</code> turns CSRF protection on: a POST, PUT, PATCH, or DELETE without the token is refused with 403. Every template gets the token as <code>.csrfToken</code>, and this project's layout already sends it on every htmx request with <code>hx-headers:inherited</code> on the body (htmx 4 does not inherit attributes unless they say so):</p>
+        <pre class="code-block" data-lang="html"><code>&lt;body hx-headers:inherited='{&quot;X-CSRF-Token&quot;: &quot;{{`{{.csrfToken}}`}}&quot;}'&gt;</code></pre>
+        <p>A plain form that posts without htmx carries the token in a hidden field:</p>
+        <pre class="code-block" data-lang="html"><code>&lt;input type=&quot;hidden&quot; name=&quot;csrf_token&quot; value=&quot;{{`{{.csrfToken}}`}}&quot;&gt;</code></pre>
+
+        <p class="text-sm pt-6"><a href="/docs/view-transitions" hx-boost="true">Next: View Transitions →</a></p>
+    </article>
+</div>
+{{end}}

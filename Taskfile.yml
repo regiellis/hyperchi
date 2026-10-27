@@ -1,0 +1,195 @@
+version: '3'
+
+vars:
+  APP_NAME: hyperchi
+  GO_MODULE: github.com/regiellis/hyperchi
+  # The CLI is its own module (github.com/regiellis/hyperchi/cmd/hyperchi) so
+  # apps importing the framework never download cobra or lipgloss. Go commands
+  # for it run with `go -C {{.CLI_DIR}}`.
+  CLI_DIR: cmd/hyperchi
+  BUILD_DIR: bin
+  DIST_DIR: dist
+  COVERAGE_FILE: coverage.out
+
+env:
+  GOOS: "{{OS}}"
+  GOARCH: "{{ARCH}}"
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+    silent: true
+
+  # CLI Tasks
+  # Both targets bake this checkout's path into the binary via -ldflags
+  # -X main.frameworkBuildPath=<repo root>. That way `hyperchi new` from the
+  # development binary auto-wires the local replace directive without the
+  # user having to remember --framework-path or HYPERCHI_FRAMEWORK_PATH.
+  # A release binary (`go install github.com/regiellis/hyperchi/cmd/hyperchi@vX`)
+  # gets an empty path and resolves the framework from the module proxy.
+  cli:
+    desc: "Build the hyperchi CLI to bin/hyperchi (bakes in local framework path)"
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - go -C {{.CLI_DIR}} build -ldflags='-s -w -X main.frameworkBuildPath={{.TASKFILE_DIR}}' -o {{.TASKFILE_DIR}}/{{.BUILD_DIR}}/{{.APP_NAME}} .
+
+  cli:install:
+    desc: "Install the hyperchi CLI to $GOBIN (bakes in local framework path)"
+    cmds:
+      - go -C {{.CLI_DIR}} install -ldflags='-s -w -X main.frameworkBuildPath={{.TASKFILE_DIR}}' .
+
+  # Scaffold a fresh project with the just-built CLI and drop into `task dev`.
+  # We pass --framework-path so the CLI itself injects the local replace
+  # directive and runs `go mod tidy` — that way the same flag works for any
+  # user who wants to scaffold against a local checkout (not just from here).
+  # Override defaults: task scaffold NAME=foo DIR=$HOME/projects
+  scaffold:
+    desc: "Build CLI, scaffold a fresh demo project, run task dev inside it (blocks)"
+    vars:
+      NAME: '{{.NAME | default "demo"}}'
+      DIR: '{{.DIR | default "/tmp"}}'
+      CLI: /tmp/hc-dev
+    cmds:
+      - go -C {{.CLI_DIR}} build -ldflags='-X main.frameworkBuildPath={{.TASKFILE_DIR}}' -o {{.CLI}} .
+      - rm -rf {{.DIR}}/{{.NAME}}
+      - cd {{.DIR}} && {{.CLI}} new {{.NAME}}
+      - cd {{.DIR}}/{{.NAME}} && task dev
+
+  scaffold:dry:
+    desc: "Build CLI and scaffold a fresh project — but don't start dev (lets you inspect)"
+    vars:
+      NAME: '{{.NAME | default "demo"}}'
+      DIR: '{{.DIR | default "/tmp"}}'
+      CLI: /tmp/hc-dev
+    cmds:
+      - go -C {{.CLI_DIR}} build -ldflags='-X main.frameworkBuildPath={{.TASKFILE_DIR}}' -o {{.CLI}} .
+      - rm -rf {{.DIR}}/{{.NAME}}
+      - cd {{.DIR}} && {{.CLI}} new {{.NAME}}
+      - 'echo ""'
+      - 'echo "Scaffold ready at {{.DIR}}/{{.NAME}}"'
+      - 'echo "  cd {{.DIR}}/{{.NAME}} && task dev"'
+
+  # Build Tasks
+  build:
+    desc: "Build for production (frontend assets + CLI binary)"
+    deps: [build_assets, cli]
+    cmds:
+      - echo "Build complete!"
+      - echo "Binary in {{.BUILD_DIR}}/{{.APP_NAME}}"
+      - echo "Frontend dist in frontend/dist/"
+
+  build_assets:
+    desc: "Build frontend assets with Vite (HyperChi runtime bundle)"
+    cmds:
+      - cd frontend && npm run build
+
+  # Testing
+  test:
+    desc: "Run the framework and CLI module tests"
+    cmds:
+      - go test -v ./...
+      - go -C {{.CLI_DIR}} test -v ./...
+
+  # Documentation
+  docs:
+    desc: "Generate and serve documentation with godoc"
+    cmds:
+      - echo "Starting documentation server..."
+      - ./scripts/docs.sh serve
+
+  docs_generate:
+    desc: "Generate static HTML documentation"
+    cmds:
+      - echo "Generating static documentation..."
+      - ./scripts/docs.sh generate
+
+  docs_check:
+    desc: "Check documentation coverage"
+    cmds:
+      - echo "Checking documentation coverage..."
+      - ./scripts/docs.sh check
+
+  docs_install:
+    desc: "Install godoc tools"
+    cmds:
+      - echo "Installing godoc tools..."
+      - ./scripts/docs.sh install
+
+  # Maintenance
+  clean:
+    desc: "Clean build artifacts"
+    cmds:
+      - echo "Cleaning..."
+      - rm -rf {{.BUILD_DIR}}/ {{.DIST_DIR}}/ {{.COVERAGE_FILE}} coverage.html coverage/
+      - go clean
+
+  # Refresh the JS bundles that the CLI embeds via //go:embed and writes
+  # into every scaffolded project. Run this after rebuilding the directive
+  # bundle (frontend/dist/) or editing frontend/assets/scripts/hyperchi-view-transitions.js.
+  sync-cli-assets:
+    desc: "Sync compiled JS bundles into cmd/hyperchi/assets/ for CLI embedding"
+    cmds:
+      - cp frontend/dist/hyperchi-directives.js {{.CLI_DIR}}/assets/hyperchi-directives.js
+      - cp frontend/assets/scripts/hyperchi-view-transitions.js {{.CLI_DIR}}/assets/hyperchi-view-transitions.js
+      - echo "{{.CLI_DIR}}/assets/ refreshed. Rebuild the CLI to pick up changes."
+
+  # The runtime framework embeds SSE, WebSocket, and prefetch browser scripts
+  # served at /hyperchi/js/*. Source of truth is frontend/assets/scripts/; run this
+  # after editing an extension, then rebuild anything importing hyperchi.
+  sync-runtime-assets:
+    desc: "Sync browser scripts into hyperchi/extensions/scripts/ for runtime embedding"
+    cmds:
+      - cp frontend/assets/scripts/hx-sse.js hyperchi/extensions/scripts/hx-sse.js
+      - cp frontend/assets/scripts/hx-ws.js hyperchi/extensions/scripts/hx-ws.js
+      - cp frontend/assets/scripts/hyperchi-prefetch.js hyperchi/extensions/scripts/hyperchi-prefetch.js
+      - cp frontend/assets/scripts/hyperchi-analytics.js hyperchi/extensions/scripts/hyperchi-analytics.js
+      - echo "hyperchi/extensions/scripts/ refreshed — rebuild to pick up changes."
+
+  check:
+    desc: Build, vet, and race-test the framework, the CLI module, and generated projects
+    cmds:
+      - go build ./...
+      - CGO_ENABLED=0 go build ./...
+      - go vet ./...
+      - go test -race -count=1 ./...
+      - go -C {{.CLI_DIR}} build ./...
+      - go -C {{.CLI_DIR}} vet ./...
+      - go -C {{.CLI_DIR}} test -race -count=1 ./...
+
+  cover:
+    desc: "Race-test the framework with coverage and fail below the floor in scripts/coverage-floor.sh (COVER_MIN overrides)"
+    cmds:
+      - mkdir -p coverage
+      - go test -race -count=1 -coverprofile=coverage/total.coverprofile ./...
+      - sh scripts/coverage-floor.sh coverage/total.coverprofile
+
+  lint:
+    desc: Run golangci-lint in the framework and CLI modules
+    cmds:
+      - golangci-lint run ./...
+      - cd {{.CLI_DIR}} && golangci-lint run ./...
+
+  security:
+    desc: Scan framework and CLI code against current Go vulnerability advisories
+    cmds:
+      - go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+      - go -C {{.CLI_DIR}} run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./...
+
+  eval:agents:
+    desc: "Run the agent idiom eval: fresh agents build the fixed tasks in scaffolded projects (spends model usage; MODEL=sonnet ONLY=task,...)"
+    cmds:
+      - go run ./evals/agentidioms/cmd/agent-eval -model {{.MODEL | default "sonnet"}} -only "{{.ONLY}}"
+
+  eval:grade:
+    desc: "Grade an existing project for net/http fallbacks (DIR=path)"
+    cmds:
+      - go run ./evals/agentidioms/cmd/agent-eval -grade {{.DIR}}
+
+  release:check:
+    desc: Run checks required before publishing a version tag
+    cmds:
+      - task: check
+      - task: lint
+      - task: security

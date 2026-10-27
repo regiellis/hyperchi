@@ -1,0 +1,117 @@
+{{define "docs-directives"}}
+<div class="max-w-6xl mx-auto px-6 py-10 flex gap-12">
+    {{template "sidebar" .}}
+
+    <article class="prose flex-1 max-w-3xl" hc-data="dx">
+        <h1>Directives</h1>
+        <p class="lede">Reactive HTML attributes. No build step beyond the bundled JS. Write
+        <code>hc-*</code> on any element and it just works.</p>
+
+        <h2 id="hc-data">hc-data</h2>
+        <p>Defines a <strong>reactive scope</strong>. Every <code>hc-*</code> directive on or
+        below the element reads from this scope. Pass an inline object expression, a
+        registered component name, or a factory call.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;div hc-data=&quot;{ count: 0 }&quot;&gt;
+  &lt;button hc-on:click=&quot;count++&quot;&gt;Click&lt;/button&gt;
+  &lt;span hc-text=&quot;count&quot;&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+        <p>For anything reusable, register a factory once and reference by name:</p>
+        <pre class="code-block" data-lang="js"><code>HyperChi.registerComponent('counter', () =&gt; ({
+  n: 0,
+  inc() { this.n++ },
+}))</code></pre>
+        <pre class="code-block" data-lang="html"><code>&lt;div hc-data=&quot;counter&quot;&gt; ... &lt;/div&gt;</code></pre>
+
+        <h2 id="hc-on">hc-on:event</h2>
+        <p>Attaches an event handler. The expression is a JS statement run in the scope's
+        context: <code>this</code> is the component, and DOM globals work.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;button hc-on:click=&quot;n++&quot;&gt;Add 1&lt;/button&gt;
+&lt;form hc-on:submit.prevent=&quot;save()&quot;&gt;...&lt;/form&gt;
+&lt;input hc-on:keydown.enter=&quot;commit()&quot;&gt;</code></pre>
+        <p>Modifiers: <code>.prevent</code>, <code>.stop</code>, <code>.self</code>,
+        <code>.once</code>, plus key filters like <code>.enter</code>, <code>.escape</code>.
+        The shorthand <code>@click</code> works too if you're coming from Alpine/Vue.</p>
+
+        <div class="demo">
+            <div class="demo-label">Live</div>
+            <button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-3 py-1.5 rounded text-sm" hc-on:click="n++">
+                Click me
+            </button>
+            <span class="ml-3 text-sm">n = <strong hc-text="n">0</strong></span>
+        </div>
+
+        <h2 id="hc-text">hc-text</h2>
+        <p>Reactive text content. The expression is re-evaluated whenever any reactive
+        dependency changes.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;p hc-text=&quot;`Hello, ${name}!`&quot;&gt;&lt;/p&gt;
+&lt;span hc-text=&quot;items.length + ' items'&quot;&gt;&lt;/span&gt;</code></pre>
+
+        <h2 id="hc-bind">hc-bind:attr  /  :attr</h2>
+        <p>Reactive attribute binding. Use the <code>:attr</code> shorthand for brevity.
+        Special handling for <code>class</code> (object or array form) and <code>style</code>
+        (object form).</p>
+        <pre class="code-block" data-lang="html"><code>&lt;img :src=&quot;avatar&quot; :alt=&quot;name&quot;&gt;
+&lt;button :disabled=&quot;loading&quot;&gt;Save&lt;/button&gt;
+
+&lt;!-- class object form --&gt;
+&lt;div :class=&quot;{ active: isOpen, 'text-red-500': hasError }&quot;&gt;...&lt;/div&gt;
+
+&lt;!-- style object form --&gt;
+&lt;div :style=&quot;{ width: progress + '%', color: theme.fg }&quot;&gt;...&lt;/div&gt;</code></pre>
+
+        <h2 id="hc-show">hc-show</h2>
+        <p>Conditional <code>display</code>. Hides via inline style; the element stays in the
+        DOM. Use <code>hc-if</code> if you need to remove the node entirely.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;div hc-show=&quot;cart.length &gt; 0&quot;&gt;
+  &lt;button hc-on:click=&quot;checkout()&quot;&gt;Check out&lt;/button&gt;
+&lt;/div&gt;
+&lt;p hc-show=&quot;cart.length === 0&quot;&gt;Your cart is empty.&lt;/p&gt;</code></pre>
+
+        <h2 id="hc-model">hc-model</h2>
+        <p>Two-way binding for form inputs.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;input hc-model=&quot;email&quot; type=&quot;email&quot;&gt;
+&lt;textarea hc-model=&quot;notes&quot;&gt;&lt;/textarea&gt;
+&lt;select hc-model=&quot;country&quot;&gt;...&lt;/select&gt;
+&lt;input hc-model=&quot;agreed&quot; type=&quot;checkbox&quot;&gt;</code></pre>
+        <div class="demo">
+            <div class="demo-label">Live</div>
+            <input class="border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded px-3 py-1.5 text-sm" hc-model="msg" placeholder="Type something">
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">You typed: <strong hc-text="msg || '(nothing yet)'"></strong></p>
+        </div>
+
+        <h2 id="hc-persist">hc-persist</h2>
+        <p>Sync scope keys to <code>localStorage</code>. Hydrates on load before
+        <code>init()</code> runs, so persisted values are visible to your factory.</p>
+        <pre class="code-block" data-lang="html"><code>&lt;html hc-data=&quot;app()&quot; hc-persist=&quot;darkMode:theme&quot;&gt;</code></pre>
+        <p>Format is <code>scopeKey:storageKey</code>, comma-separated for multiple keys.
+        That single attribute is what powers this site's dark-mode toggle.</p>
+
+        <h2 id="hc-effect">hc-effect</h2>
+        <p>Run JS as a side effect when reactive dependencies change. Useful for syncing
+        scope state to the outside world (DOM classes, document title, analytics).</p>
+        <pre class="code-block" data-lang="html"><code>&lt;html hc-data=&quot;app()&quot;
+      hc-effect=&quot;document.documentElement.classList.toggle('dark', !!darkMode);
+                 document.title = unread ? `(${unread}) ` + base : base&quot;&gt;</code></pre>
+
+        <h2 id="hc-cloak">hc-cloak</h2>
+        <p>An attribute the directive engine removes once it's processed an element. Pair
+        with the CSS rule <code>[hc-cloak] { display: none !important }</code> to hide
+        un-bootstrapped content and avoid a flash of <code>hc-text="..."</code> placeholders.</p>
+
+        <hr>
+
+        <h2 id="composing">Composing with HTMX</h2>
+        <p>Directives drive <em>local</em> reactivity. HTMX drives <em>server</em> swaps.
+        They don't fight. Directives walk re-processed nodes after each htmx swap so
+        attribute bindings persist on freshly inserted markup.</p>
+        <p>Rule of thumb: if the truth lives on the server, swap a fragment with HTMX.
+        If it lives on the client (UI state, drafts, toggles), use a directive.</p>
+
+        <p class="text-sm pt-6"><a href="/docs/htmx" hx-boost="true">Next: HTMX patterns →</a></p>
+    </article>
+</div>
+
+<script>
+  HyperChi.registerComponent('dx', () => ({ n: 0, msg: '' }))
+</script>
+{{end}}

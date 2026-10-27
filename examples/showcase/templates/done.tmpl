@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>{{template "site-head" .}}</head>
+<body hc-data="site()" id="top">
+{{template "site-nav" .}}
+<main id="main" class="section-space confirmation">
+  <p class="eyebrow">Multi-step form / Complete</p>
+  <h1>That’s a wrap.</h1>
+  <p>Your form was validated on the server, your draft was saved, and HyperChi brought you here.</p>
+  <p class="muted mono">Draft saves handled by this process: {{ .saves }}. Forms completed: {{ .completed }}.</p>
+  <a class="btn btn-primary" href="/#waitlist">Back to the playground ↗</a>
+</main>
+{{template "site-footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

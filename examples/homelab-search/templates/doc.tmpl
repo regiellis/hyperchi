@@ -1,0 +1,38 @@
+{{define "doc"}}{{with .doc}}<article class="doc" aria-labelledby="doc-title">
+  <header class="doc-head">
+    <p class="crumbs"><a href="/" hx-get="/" hx-target="#main" hx-push-url="true">library</a> / {{.Path}}</p>
+    <h1 id="doc-title">{{.Title}}</h1>
+    <div class="doc-meta">
+      <span class="type">{{.Type}}</span>{{range .Tags}}<a class="tag" href="/?tag={{.}}">#{{.}}</a>{{end}}
+      <span class="num">{{bytes .Size}}</span>
+      <time datetime="{{.Modified.Format "2006-01-02T15:04:05Z07:00"}}">{{.Modified.Format "2006-01-02 15:04"}}</time>
+      <span class="actions">
+        <a class="btn" href="/raw/{{.Path}}">Raw</a>
+        <a class="btn" href="/raw/{{.Path}}?download=1" download>Download</a>
+      </span>
+    </div>
+  </header>
+  {{- with $.note}}<p class="note">{{.}}</p>{{end}}
+  {{- if $.html}}
+  <div class="doc-body{{if not $.outline}} no-outline{{end}}">
+    <div class="prose{{if $.hideFirstH1}} hide-first-h1{{end}}">{{$.html}}</div>
+    {{- with $.outline}}
+    <nav class="outline" aria-label="Outline">
+      <p>Outline</p>
+      {{- range .}}<a class="l{{.Level}}" href="#{{.ID}}">{{.Text}}</a>{{end}}
+    </nav>
+    {{- end}}
+  </div>
+  {{- else if $.lines}}
+  <div class="code" role="region" aria-label="Contents of {{.Path}}" tabindex="0">
+    <table><tbody>
+      {{- range $.lines}}<tr id="L{{.N}}"><td class="ln"><a href="#L{{.N}}">{{.N}}</a></td><td class="lc">{{.Text}}</td></tr>{{end}}
+    </tbody></table>
+  </div>
+  {{- else}}
+  <div class="empty">
+    <h2>This file is listed, not shown.</h2>
+    <p>{{if .Reason}}Reason: {{.Reason}}. {{end}}Use Download to open it with another program.</p>
+  </div>
+  {{- end}}
+</article>{{end}}{{end}}

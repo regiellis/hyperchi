@@ -1,0 +1,10 @@
+[Unit]
+Description=Renew the wildcard certificate twice a day
+
+[Timer]
+OnCalendar=*-*-* 03,15:10:00
+RandomizedDelaySec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

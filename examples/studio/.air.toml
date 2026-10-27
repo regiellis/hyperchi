@@ -1,0 +1,23 @@
+# Driftlamp studio: Air live reload. Content and static files are embedded,
+# so edits to Markdown, CSS, JS, and images rebuild the binary too.
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "CGO_ENABLED=0 go build -o ./tmp/studio ."
+  bin = "./tmp/studio"
+  delay = 500
+  include_ext = ["go", "tmpl", "md", "css", "js", "svg", "png", "woff2"]
+  exclude_dir = ["tmp", "data", "art"]
+  exclude_regex = ["_test.go"]
+  kill_delay = "500ms"
+  send_interrupt = true
+  log = "build-errors.log"
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true

@@ -1,0 +1,45 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Source code
+*.go text eol=lf diff=golang
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+
+# Scripts
+*.sh text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+
+# Images (treat as binary)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg text
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+
+# Go binaries
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# Databases
+*.db binary
+*.sqlite binary
+*.sqlite3 binary

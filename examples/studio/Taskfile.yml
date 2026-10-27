@@ -1,0 +1,51 @@
+version: '3'
+
+# Driftlamp studio example. One Go server; no Node. Per the repo rule, never
+# `go build` here: run with `go run .` or Air (which builds into ./tmp).
+
+vars:
+  PORT: '{{.PORT | default "8080"}}'
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  dev:
+    desc: Run with Air hot reload on 0.0.0.0:{{.PORT}} (falls back to the next free port)
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - air
+
+  run:
+    desc: Run without hot reload on 0.0.0.0:{{.PORT}}
+    env:
+      PORT: '{{.PORT}}'
+    cmds:
+      - go run .
+
+  test:
+    desc: Race tests with coverage (content, routes, feed, sitemap, newsletter, 404)
+    cmds:
+      - go test -race -count=1 -cover ./...
+
+  lint:
+    desc: gofmt check, go vet, and golangci-lint
+    cmds:
+      - test -z "$(gofmt -l .)"
+      - go vet ./...
+      - golangci-lint run ./...
+
+  og:
+    desc: Re-render the Open Graph PNGs from the SVG art with headless Chrome
+    cmds:
+      - for: [lamplit-crossing, pocket-orrery, drystone]
+        cmd: google-chrome --headless=new --hide-scrollbars --window-size=1200,630 --screenshot=static/img/og/{{.ITEM}}.png "file://$PWD/static/img/games/{{.ITEM}}/key-art.svg"
+      - google-chrome --headless=new --hide-scrollbars --window-size=1200,630 --screenshot=static/img/og/studio.png "file://$PWD/art/og-studio.svg"
+
+  clean:
+    desc: Remove Air output and the local database
+    cmds:
+      - rm -rf tmp data build-errors.log
