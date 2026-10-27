@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>{{template "site-head" .}}</head>
+<body hc-data="site()" id="top">
+{{template "site-nav" .}}
+<main id="main" class="section-space built-with">
+  <div class="section-heading">
+    <p class="eyebrow">Built with HyperChi</p>
+    <h1>Running in production.</h1>
+    <p>Real sites on the framework, rendered on the server and shipped as one Go binary.</p>
+  </div>
+  <ul class="built-grid" role="list">
+    {{range .sites}}
+    <li class="built-card">
+      <img src="{{asset .Image}}" alt="{{.Alt}}" width="1200" height="750" loading="lazy" decoding="async">
+      <p class="eyebrow">{{.Kind}}</p>
+      <h2><a href="{{.URL}}">{{.Name}}</a></h2>
+      <p>{{.Description}}</p>
+      <span class="built-host" aria-hidden="true">{{.Host}} ↗</span>
+    </li>
+    {{end}}
+  </ul>
+  <div class="built-next">
+    <p>Build the next one.</p>
+    <a class="btn btn-primary" href="/docs">Start building <span aria-hidden="true">↗</span></a>
+  </div>
+</main>
+{{template "site-footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

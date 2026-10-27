@@ -1,0 +1,34 @@
+{{define "layout-base"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.title | default .siteName}}</title>
+  <meta name="description" content="A realtime dice game for two to four players, built with Go, htmx, and HyperChi.">
+  <meta name="color-scheme" content="light dark">
+  {{/* Keep sockets open while a tab is in the background: a hidden tab that
+       dropped its socket would look like a player who left. */}}
+  <meta name="htmx-config" content='{"ws": {"pauseOnBackground": false}}'>
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/arena.css">
+  <script src="/static/js/htmx.min.js"></script>
+  <script src="/hyperchi/js/hx-ws.js"></script>
+  <script src="/static/js/hyperchi-directives.js"></script>
+  <script src="/static/js/arena.js" defer></script>
+</head>
+{{/* Every htmx request on the page carries the CSRF token. */}}
+<body hc-data="arena()" hc-on:keydown="shortcut($event)"{{with .csrf}} hx-headers:inherited='{"X-CSRF-Token": "{{.}}"}'{{end}}>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="wordmark" href="/" aria-label="{{.siteName}}, back to the lobby">
+      <svg class="wordmark-die" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7"/><circle cx="10" cy="10" r="2.6"/><circle cx="16" cy="16" r="2.6"/><circle cx="22" cy="22" r="2.6"/></svg>
+      <span>{{.siteName}}</span>
+    </a>
+    {{with .me}}{{if .Name}}<span class="who">Playing as <strong>{{.Name}}</strong></span>{{end}}{{end}}
+  </header>
+  {{.content}}
+  <footer class="footer">
+    <p>Server-rendered with Go and <a href="https://github.com/regiellis/hyperchi">HyperChi</a>. Every die is rolled on the server.</p>
+  </footer>
+</body>
+</html>{{end}}

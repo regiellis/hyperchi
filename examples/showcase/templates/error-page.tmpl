@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>{{template "site-head" .}}
+<meta name="robots" content="noindex"></head>
+<body hc-data="site()" id="top">
+{{template "site-nav" .}}
+<main id="main" class="section-space confirmation">
+  <p class="eyebrow">Error / {{ .status }}</p>
+  <h1>{{ .heading }}</h1>
+  <p>{{ .message }}</p>
+  <a class="btn btn-primary" href="/">Back to the homepage</a>
+</main>
+{{template "site-footer" .}}
+{{template "site-scripts" .}}
+</body>
+</html>

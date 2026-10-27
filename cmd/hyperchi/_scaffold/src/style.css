@@ -1,0 +1,247 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 source scanning */
+@source "../templates/**/*.tmpl";
+@source "./**/*.{js,ts}";
+
+/* Dark mode via class on <html> */
+@variant dark (&:where(.dark, .dark *));
+
+/* Serif face for headings */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+@theme {
+    --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* HyperChi cloak: hide hc-cloaked elements until directives boot */
+[hc-cloak] { display: none !important; }
+
+/* hc-transition presets: hyperchi-directives adds and removes these classes */
+.fade-enter { animation: hc-fade-in 300ms ease-out forwards; }
+.fade-leave { transition: opacity 200ms ease-in; opacity: 0; }
+@keyframes hc-fade-in { from { opacity: 0 } to { opacity: 1 } }
+
+/* View transitions, used because base.tmpl sets "transitions": true in htmx-config */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 250ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-old(root) { animation-name: vt-fade-out; }
+::view-transition-new(root) { animation-name: vt-fade-in; }
+@keyframes vt-fade-in  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes vt-fade-out { from { opacity: 1 } to { opacity: 0 } }
+
+.vt-animate-slide::view-transition-old(root),
+::view-transition-old(.vt-animate-slide) { animation: vt-slide-out 300ms cubic-bezier(0.4, 0, 0.2, 1); }
+.vt-animate-slide::view-transition-new(root),
+::view-transition-new(.vt-animate-slide) { animation: vt-slide-in 300ms cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes vt-slide-in  { from { transform: translateX(20px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+@keyframes vt-slide-out { from { transform: translateX(0); opacity: 1 } to { transform: translateX(-20px); opacity: 0 } }
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none !important; }
+}
+
+/* Prose styles for <article class="prose">, written by hand instead of
+   depending on @tailwindcss/typography */
+.prose { color: var(--color-slate-700); line-height: 1.7; }
+.dark .prose { color: var(--color-slate-300); }
+
+.prose h1 {
+    font-family: var(--font-serif);
+    font-size: 2.75rem;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+    color: var(--color-slate-900);
+}
+.dark .prose h1 { color: white; }
+
+.prose .lede {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--color-slate-600);
+    margin-bottom: 2.5rem;
+}
+.dark .prose .lede { color: var(--color-slate-400); }
+
+.prose h2 {
+    font-family: var(--font-serif);
+    font-size: 1.875rem;
+    line-height: 1.2;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-slate-900);
+    scroll-margin-top: 5rem;
+}
+.dark .prose h2 { color: white; }
+
+.prose h3 {
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-slate-900);
+    scroll-margin-top: 5rem;
+}
+.dark .prose h3 { color: white; }
+
+.prose p { margin-bottom: 1rem; }
+
+.prose a {
+    color: var(--color-emerald-600);
+    text-decoration: underline;
+    text-decoration-color: rgb(16 185 129 / 0.3);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms;
+}
+.prose a:hover { text-decoration-color: rgb(16 185 129 / 1); }
+.dark .prose a { color: var(--color-emerald-400); text-decoration-color: rgb(52 211 153 / 0.3); }
+.dark .prose a:hover { text-decoration-color: rgb(52 211 153 / 1); }
+
+.prose strong { color: var(--color-slate-900); font-weight: 600; }
+.dark .prose strong { color: white; }
+
+.prose ul, .prose ol { margin: 1rem 0 1rem 1.5rem; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li { margin: 0.25rem 0; }
+
+.prose hr {
+    border: none;
+    border-top: 1px solid var(--color-slate-200);
+    margin: 3rem 0;
+}
+.dark .prose hr { border-top-color: var(--color-slate-800); }
+
+/* Inline code */
+.prose :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--color-slate-100);
+    color: var(--color-slate-900);
+    padding: 0.1em 0.4em;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-slate-200);
+}
+.dark .prose :not(pre) > code {
+    background: var(--color-slate-800);
+    color: var(--color-slate-100);
+    border-color: var(--color-slate-700);
+}
+
+/* Code blocks */
+.code-block {
+    position: relative;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.825rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 1.25rem 0;
+}
+.code-block::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.55rem;
+    right: 0.85rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    pointer-events: none;
+}
+.code-block code { font-family: inherit; background: transparent; padding: 0; border: 0; color: inherit; }
+
+/* Code-gate (collapsible long examples) */
+.code-gate { margin: 1rem 0; }
+.code-gate > summary {
+    cursor: pointer;
+    font-size: 0.825rem;
+    color: var(--color-slate-500);
+    user-select: none;
+    padding: 0.4rem 0;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.code-gate > summary::-webkit-details-marker { display: none; }
+.code-gate > summary::before {
+    content: '▸';
+    transition: transform 150ms;
+    display: inline-block;
+}
+.code-gate[open] > summary::before { transform: rotate(90deg); }
+.code-gate > summary:hover { color: var(--color-slate-700); }
+.dark .code-gate > summary:hover { color: var(--color-slate-300); }
+
+/* Sidebar nav */
+.sidebar-link {
+    display: block;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-slate-600);
+    transition: background-color 150ms, color 150ms;
+}
+.sidebar-link:hover {
+    background: var(--color-slate-100);
+    color: var(--color-slate-900);
+}
+.dark .sidebar-link { color: var(--color-slate-400); }
+.dark .sidebar-link:hover { background: var(--color-slate-800); color: white; }
+
+.sidebar-link[aria-current='page'] {
+    background: var(--color-slate-900);
+    color: white;
+    font-weight: 500;
+}
+.dark .sidebar-link[aria-current='page'] {
+    background: white;
+    color: var(--color-slate-900);
+}
+
+/* Topic card on the landing page */
+.topic-card {
+    display: block;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid var(--color-slate-200);
+    border-radius: 0.75rem;
+    transition: border-color 200ms, transform 200ms;
+}
+.topic-card:hover {
+    border-color: var(--color-slate-400);
+    transform: translateY(-2px);
+}
+.dark .topic-card { background: var(--color-slate-900); border-color: var(--color-slate-800); }
+.dark .topic-card:hover { border-color: var(--color-slate-600); }
+
+/* Demo callouts within docs prose */
+.demo {
+    background: var(--color-slate-50);
+    border: 1px solid var(--color-slate-200);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin: 1.25rem 0;
+}
+.dark .demo { background: var(--color-slate-900); border-color: var(--color-slate-800); }
+.demo .demo-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-slate-500);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}

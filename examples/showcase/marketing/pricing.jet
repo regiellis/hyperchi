@@ -1,0 +1,4 @@
+<div class="pricing-result">
+ <div class="plan-grid">{{range .Plans}}<article class="plan"><h3>{{.Name}}</h3><p class="price">{{.Price}}<small> / month</small></p><p>{{.Description}}</p><ul><li>Unlimited project notes</li><li>Shared milestones and files</li><li>Weekly team digest</li></ul><a href="#questions">See what is included ↗</a></article>{{end}}</div>
+ <p class="billing-note">{{.Note}}</p>
+</div>
